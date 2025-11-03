@@ -117,7 +117,11 @@ jobs:
       - name: Run tests (conda)
         shell: bash -l {0}
         run: |
-          source activate pyrosetta-env
+          # Initialize conda for the current shell
+          eval "$(conda shell.bash hook)"
+          # Activate the environment
+          conda activate pyrosetta-env
+          # Run unittest
           python -m unittest discover -s pyrosetta.tests.distributed.cluster
 
   # ============================================================
@@ -147,5 +151,9 @@ jobs:
       - name: Run tests (mamba)
         shell: bash -l {0}
         run: |
-          source activate pyrosetta-env
+          # Initialize conda for the current shell
+          eval "$(conda shell.bash hook)"
+          # Activate the environment
+          conda activate pyrosetta-env
+          # Run unittest
           python -m unittest discover -s pyrosetta.tests.distributed.cluster
