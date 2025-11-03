@@ -65,7 +65,7 @@ jobs:
 
       - name: Install PyRosetta dependencies
         run: |
-          uv pip install pyrosetta-installer
+          uv pip install --system pyrosetta-installer
 
       - name: Install PyRosetta via installer
         run: |
