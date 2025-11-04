@@ -37,7 +37,7 @@ jobs:
       - name: Run tests (pixi)
         run: |
           cd pyrosetta/pixi
-          pixi run uv run -p pyrosetta_uv_project python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_pixi -v
+          pixi run python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_pixi -v
 
   # ============================================================
   # UV JOB
