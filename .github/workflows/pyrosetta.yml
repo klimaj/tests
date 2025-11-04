@@ -1,34 +1,159 @@
 name: PyRosetta
 
 on:
-    push:
-        branches: ['*']
-        tags: ['*']
-    pull_request:
-        branches: ['*']
-    schedule:
+  push:
+    branches: ['*']
+    tags: ['*']
+  pull_request:
+    branches: ['*']
+  schedule:
     # Run Every Monday 4 AM UTC
-        - cron: '0 4 * * 1'
+    - cron: '0 4 * * 1'
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
+
+  # ============================================================
+  # PIXI JOB
+  # ============================================================
   pixi:
+    name: Pixi
     runs-on: ubuntu-latest
     strategy:
-        matrix:
-          #environment: [py310, py311, py312, py313, py314, ]
-          environment: [py313, ]
+      matrix:
+        python-version: [3.13]
+        # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
     steps:
-    - uses: actions/checkout@v4
-    - uses: prefix-dev/setup-pixi@v0.9.2
-      with:
-        environments: ${{ matrix.environment }}
-        manifest-path: pyrosetta/pixi/pixi.toml
+      - uses: actions/checkout@v4
 
-    - name: distributed.cluster
-      run: |
-        #cd pyrosetta/pixi && pixi run -e ${{ matrix.environment }} test
-        # cd pyrosetta/pixi && pixi run python -m unittest pyrosetta.tests.*
-        cd pyrosetta/pixi && pixi run python -m unittest discover -s pyrosetta.tests.distributed.cluster
+      - name: Set up Pixi
+        uses: prefix-dev/setup-pixi@v0.9.2
+        with:
+          environments: py313
+          manifest-path: pyrosetta/pixi/pixi.toml
+
+      - name: Run tests (pixi)
+        run: |
+          cd pyrosetta/pixi
+          pixi run python -m unittest discover -s pyrosetta.tests.distributed.cluster
+
+  # ============================================================
+  # UV JOB
+  # ============================================================
+  uv:
+    name: uv
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.13]
+        # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          uv --version
+
+      - name: Install PyRosetta dependencies
+        run: |
+          uv pip install --system pyrosetta-installer
+
+      - name: Install PyRosetta via installer
+        run: |
+          python - <<'EOF'
+          import pyrosetta_installer
+          try:
+              pyrosetta_installer.install_pyrosetta(
+                  distributed=True,
+                  serialization=True,
+                  skip_if_installed=True,
+                  mirror=0
+              )
+          except Exception as e:
+              print(f"PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
+              pyrosetta_installer.install_pyrosetta(
+                  distributed=True,
+                  serialization=True,
+                  skip_if_installed=True,
+                  mirror=1
+              )
+          EOF
+
+      - name: Run tests (uv)
+        run: |
+          python -m unittest discover -s pyrosetta.tests.distributed.cluster
+
+  # ============================================================
+  # CONDA JOB
+  # ============================================================
+  conda:
+    name: Conda
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.13]
+        # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          auto-update-conda: true
+          activate-environment: pyrosetta-env
+          environment-file: pyrosetta/conda/environment.yml
+          channel-priority: strict
+
+      - name: Run tests (conda)
+        shell: bash -l {0}
+        run: |
+          # Initialize conda for the current shell
+          eval "$(conda shell.bash hook)"
+          # Activate the environment
+          conda activate pyrosetta-env
+          # Run unittest
+          python -m unittest discover -s pyrosetta.tests.distributed.cluster
+
+  # ============================================================
+  # MAMBA JOB
+  # ============================================================
+  mamba:
+    name: Mamba
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.13]
+        # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          auto-update-conda: true
+
+      - name: Set up Mamba
+        run: |
+          conda install -n base -c conda-forge mamba
+          mamba env create -f pyrosetta/conda/environment.yml
+
+      - name: Run tests (mamba)
+        shell: bash -l {0}
+        run: |
+          # Initialize conda for the current shell
+          eval "$(conda shell.bash hook)"
+          # Activate the environment
+          conda activate pyrosetta-env
+          # Run unittest
+          python -m unittest discover -s pyrosetta.tests.distributed.cluster
