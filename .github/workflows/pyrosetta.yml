@@ -84,7 +84,7 @@ jobs:
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           cd pyrosetta_uv_project
-          python - <<'EOF'
+          uv run python - <<'EOF'
           import pyrosetta_installer
           try:
               pyrosetta_installer.install_pyrosetta(
