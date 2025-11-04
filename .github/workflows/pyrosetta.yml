@@ -83,6 +83,7 @@ jobs:
       - name: Install PyRosetta via installer in uv project
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          cd pyrosetta_uv_project
           python - <<'EOF'
           import pyrosetta_installer
           try:
@@ -105,6 +106,7 @@ jobs:
       - name: Run tests (uv)
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          cd pyrosetta_uv_project
           uv run -p pyrosetta_uv_project python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_uv -v
 
   # ============================================================
