@@ -107,6 +107,8 @@ jobs:
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           cd pyrosetta_uv_project
+          uv run python -c "import sys; print(sys.path)"
+          uv run python -c "import pyrosetta; print(pyrosetta.__file__)"
           uv run python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_uv -v
 
   # ============================================================
