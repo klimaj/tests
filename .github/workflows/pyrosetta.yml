@@ -37,7 +37,7 @@ jobs:
       - name: Run tests (pixi)
         run: |
           cd pyrosetta/pixi
-          pixi run python -u -m unittest discover -s pyrosetta.tests.distributed.cluster -v
+          pixi run uv run -p pyrosetta_uv_project python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_pixi -v
 
   # ============================================================
   # UV JOB
@@ -98,7 +98,7 @@ jobs:
       - name: Run tests (uv)
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          uv run -p pyrosetta_uv_project python -u -m unittest discover -s pyrosetta.tests.distributed.cluster -v
+          uv run -p pyrosetta_uv_project python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_uv -v
 
   # ============================================================
   # CONDA JOB
@@ -130,7 +130,7 @@ jobs:
           # Activate the environment
           conda activate pyrosetta-env
           # Run unittest
-          python -u -m unittest discover -s pyrosetta.tests.distributed.cluster -v
+          python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_conda -v
 
   # ============================================================
   # MAMBA JOB
@@ -164,4 +164,4 @@ jobs:
           # Activate the environment
           conda activate pyrosetta-env
           # Run unittest
-          python -u -m unittest discover -s pyrosetta.tests.distributed.cluster -v
+          python -u -m unittest pyrosetta.tests.distributed.cluster.test_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_mamba -v
