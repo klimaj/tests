@@ -161,6 +161,12 @@ class TestEnvironmentReproducibility(unittest.TestCase):
                 f"--original_scorefile_path '{original_scorefile_path}'"
                 f"--original_decoy_name {original_decoy_name}"
             )
+            # returncode = TestEnvironmentReproducibility.run_subprocess(
+            #     cmd,
+            #     module_dir=None,
+            #     # For pixi, activate the original pixi environment context
+            #     cwd=original_env_dir,
+            # )
         elif environment_manager == "uv":
             cmd = (
                 f"uv run -p {original_env_dir} python -u {recreate_env_script}"
@@ -169,14 +175,28 @@ class TestEnvironmentReproducibility(unittest.TestCase):
                 f"--original_scorefile_path '{original_scorefile_path}'"
                 f"--original_decoy_name {original_decoy_name}"
             )
+            # returncode = TestEnvironmentReproducibility.run_subprocess(
+            #     cmd,
+            #     module_dir=None,
+            #     # For uv, run from environment directory for consistency with pixi workflow
+            #     cwd=original_env_dir,
+            # )
         elif environment_manager in ("conda", "mamba"):
+            python_bin = os.path.join(original_env_dir, "bin", "python")
             cmd = (
-                f"conda run -p {original_env_dir} python -u {recreate_env_script}"
+                # f"conda run -p {original_env_dir} python -u {recreate_env_script}"
+                f"{python_bin} -u {recreate_env_script}"
                 f"--env_manager '{environment_manager}'"
                 f"--reproduce_env_dir '{reproduce_env_dir}'"
                 f"--original_scorefile_path '{original_scorefile_path}'"
                 f"--original_decoy_name {original_decoy_name}"
             )
+            # returncode = TestEnvironmentReproducibility.run_subprocess(
+            #     cmd,
+            #     module_dir=None,
+            #     # For conda/mamba, run from environment directory for consistency with pixi workflow
+            #     cwd=original_env_dir,
+            # )
         returncode = TestEnvironmentReproducibility.run_subprocess(
             cmd,
             module_dir=None,
