@@ -14,6 +14,7 @@ def create_tasks():
         "options": "-ex1 0 -ex1aro 0 -ex1aro_exposed 0 -ex2 0 -ex2aro 0 -ex2aro_exposed 0 -ex3 0 -ex4 0 -lazy_ig 1",
         "extra_options": "-out:level 300 -multithreading:total_threads 1 -ignore_unrecognized_res 1 -load_PDB_components 0",
         "set_logging_handler": "logging",
+        "silent": False,
         "seq": "NEW/ENV",
     }
 

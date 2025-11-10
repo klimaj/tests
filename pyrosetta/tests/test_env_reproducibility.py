@@ -131,7 +131,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             #     f"--scorefile_name '{original_scorefile_name}'"
             # )
             cmd = (
-                f"{python_bin} -u -m {module} "
+                f"conda run -p {original_env_dir} python -u -m {module} "
+                # f"{python_bin} -u -m {module} "
                 f"--env_manager '{environment_manager}' "
                 f"--output_path '{original_output_path}' "
                 f"--scorefile_name '{original_scorefile_name}'"
@@ -161,6 +162,12 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         self.assertEqual(original_record["metadata"]["environment_manager"], environment_manager)
         self.assertIn("decoy_name", original_record["metadata"])
         original_decoy_name = original_record["metadata"]["decoy_name"]
+
+        print("*" * 50)
+        print("Cached environment file:")
+        print(original_record["instance"]["environment"])
+        print("*" * 50)
+
         # Recreate environment
         reproduce_env_name = f"{original_env_name}_reproduce"
         reproduce_env_dir = os.path.join(self.workdir.name, reproduce_env_name)
