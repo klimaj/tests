@@ -106,44 +106,48 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         # Run original simulation inside new environment
         original_output_path = os.path.join(original_env_dir, f"{environment_manager}_original_outputs")
         original_scorefile_name = "test_scores.json"
+        module = os.path.splitext(os.path.basename(test_script))[0]
         if environment_manager == "pixi":
-            cmd = "pixi run python -u {0} --env_manager '{1}' --output_path '{2}' --scorefile_name '{3}'".format(
-                test_script,
-                environment_manager,
-                original_output_path,
-                original_scorefile_name,
+            cmd = (
+                f"pixi run python -u {test_script} "
+                f"--env_manager '{environment_manager}' "
+                f"--output_path '{original_output_path}' "
+                f"--scorefile_name '{original_scorefile_name}'"
             )
         elif environment_manager == "uv":
-            cmd = "uv run -p {0} python -u {1} --env_manager '{2}' --output_path '{3}' --scorefile_name '{4}'".format(
-                original_env_dir,
-                test_script,
-                environment_manager,
-                original_output_path,
-                original_scorefile_name,
+            cmd = (
+                f"uv run -p {original_env_dir} python -u {test_script} "
+                f"--env_manager '{environment_manager}' "
+                f"--output_path '{original_output_path}' "
+                f"--scorefile_name '{original_scorefile_name}'"
             )
         elif environment_manager in ("conda", "mamba"):
-            # cmd = "conda run -p {0} python -u {1} --env_manager '{2}' --output_path '{3}' --scorefile_name '{4}'".format(
-            #     original_env_dir,
-            #     test_script,
-            #     environment_manager,
-            #     original_output_path,
-            #     original_scorefile_name,
-            # )
             python_bin = os.path.join(original_env_dir, "bin", "python")
-            cmd = "{0} -u {1} --env_manager '{2}' --output_path '{3}' --scorefile_name '{4}'".format(
-                python_bin,
-                test_script,
-                environment_manager,
-                original_output_path,
-                original_scorefile_name,
+            # cmd = (
+            #     # f"conda run -p {original_env_dir} python -u {test_script} "
+            #     f"{python_bin} -u {test_script} "
+            #     f"--env_manager '{environment_manager}' "
+            #     f"--output_path '{original_output_path}' "
+            #     f"--scorefile_name '{original_scorefile_name}'"
+            # )
+            cmd = (
+                f"{python_bin} -u -m {module} "
+                f"--env_manager '{environment_manager}' "
+                f"--output_path '{original_output_path}' "
+                f"--scorefile_name '{original_scorefile_name}'"
             )
-        returncode = TestEnvironmentReproducibility.run_subprocess(
-            cmd,
-            module_dir=None,
-            # For pixi, activate the original pixi environment context
-            # For conda/mamba/uv, run from environment directory for consistency with pixi workflow
-            cwd=original_env_dir,
-        )
+            returncode = TestEnvironmentReproducibility.run_subprocess(
+                cmd,
+                module_dir=os.path.dirname(test_script),
+                cwd=original_env_dir,
+            )
+        # returncode = TestEnvironmentReproducibility.run_subprocess(
+        #     cmd,
+        #     module_dir=None,
+        #     # For pixi, activate the original pixi environment context
+        #     # For conda/mamba/uv, run from environment directory for consistency with pixi workflow
+        #     cwd=original_env_dir,
+        # )
         self.assertEqual(returncode, 0, msg=f"Subprocess command failed: {cmd}")
 
         # Recreate new environment from output scorefile
@@ -163,10 +167,10 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         recreate_env_script = os.path.join(os.path.dirname(__file__), "recreate_envs.py")
         if environment_manager == "pixi":
             cmd = (
-                f"pixi run python -u {recreate_env_script}"
-                f"--env_manager '{environment_manager}'"
-                f"--reproduce_env_dir '{reproduce_env_dir}'"
-                f"--original_scorefile_path '{original_scorefile_path}'"
+                f"pixi run python -u {recreate_env_script} "
+                f"--env_manager '{environment_manager}' "
+                f"--reproduce_env_dir '{reproduce_env_dir}' "
+                f"--original_scorefile_path '{original_scorefile_path}' "
                 f"--original_decoy_name {original_decoy_name}"
             )
             returncode = TestEnvironmentReproducibility.run_subprocess(
@@ -177,10 +181,10 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             )
         elif environment_manager == "uv":
             cmd = (
-                f"uv run -p {original_env_dir} python -u {recreate_env_script}"
-                f"--env_manager '{environment_manager}'"
-                f"--reproduce_env_dir '{reproduce_env_dir}'"
-                f"--original_scorefile_path '{original_scorefile_path}'"
+                f"uv run -p {original_env_dir} python -u {recreate_env_script} "
+                f"--env_manager '{environment_manager}' "
+                f"--reproduce_env_dir '{reproduce_env_dir}' "
+                f"--original_scorefile_path '{original_scorefile_path}' "
                 f"--original_decoy_name {original_decoy_name}"
             )
             returncode = TestEnvironmentReproducibility.run_subprocess(
@@ -193,10 +197,10 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             python_bin = os.path.join(original_env_dir, "bin", "python")
             cmd = (
                 # f"conda run -p {original_env_dir} python -u {recreate_env_script}"
-                f"{python_bin} -u {recreate_env_script}"
-                f"--env_manager '{environment_manager}'"
-                f"--reproduce_env_dir '{reproduce_env_dir}'"
-                f"--original_scorefile_path '{original_scorefile_path}'"
+                f"{python_bin} -u {recreate_env_script} "
+                f"--env_manager '{environment_manager}' "
+                f"--reproduce_env_dir '{reproduce_env_dir}' "
+                f"--original_scorefile_path '{original_scorefile_path}' "
                 f"--original_decoy_name {original_decoy_name}"
             )
             returncode = TestEnvironmentReproducibility.run_subprocess(
