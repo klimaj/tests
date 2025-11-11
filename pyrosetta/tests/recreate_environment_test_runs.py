@@ -14,7 +14,6 @@ import sys
 
 from pyrosetta.bindings.utility import bind_method
 from pyrosetta.distributed.cluster.config import (
-    get_environment_cmd,
     get_environment_manager,
     get_environment_var,
     source_domains,

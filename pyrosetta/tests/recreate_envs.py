@@ -316,6 +316,7 @@ def recreate_environment(
     # Recreate the environment
     with tempfile.TemporaryDirectory() as tmp_dir:
         env_create_cmd = _env_config.env_create_cmd(environment_name, raw_spec, tmp_dir, base_dir)
+        print(f"Running environment create command: `{env_create_cmd}`")
         output = _run_subprocess(env_create_cmd)
         print(
             f"\nEnvironment successfully created using {environment_manager}: '{environment_name}'\nOutput:\n{output}\n",
