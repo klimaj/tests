@@ -102,7 +102,7 @@ def setup_uv_environment(env_dir):
     # Create uv environment using the current Python
     print(f"Creating uv environment at '{env_path}'...")
     subprocess.run(
-        ["uv", "venv", str(env_path), "--python", py_version],
+        ["uv", "init", str(env_path), "--python", py_version],
         check=True,
     )
 
