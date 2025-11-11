@@ -138,19 +138,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Set up conda environment manager
-      - name: Set up Miniconda
+      - name: Set up Conda with Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python-version }}
           auto-update-conda: true
-          channels: conda-forge
-          activate-environment: base
+          activate-environment: false
+          use-mamba: true
+          channel-priority: strict
 
-      - name: Install Mamba
+      - name: Check Mamba
         shell: bash -l {0}
         run: |
-          conda install -c conda-forge mamba -y
           which mamba
           mamba --version
 
