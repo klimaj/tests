@@ -29,7 +29,7 @@ def get_yml() -> str:
     environment, excluding certain source domains.
     """
     _ENV_EXPORT_CMDS = {
-        "pixi": "pixi lock --no-install && cat pixi.lock", # Updated
+        "pixi": "pixi lock --check || (echo 'Regenerating pixi.lock file...' && pixi lock --no-install); cat pixi.lock", # Updated
         "uv": "uv export --format requirements-txt --frozen",
         "mamba": f"mamba env export --prefix '{sys.prefix}'",
         "conda": f"conda env export --prefix '{sys.prefix}'",
