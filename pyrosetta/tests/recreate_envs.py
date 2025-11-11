@@ -114,8 +114,11 @@ class EnvironmentConfig(Generic[G]):
             req_file = os.path.join(tmp_dir, f"{environment_name}.txt")
             with open(req_file, "w") as f:
                 f.write(raw_spec)
+            # Determine the current Python version
+            py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
             return (
-                f"uv init '{project_dir}' && "
+                f"uv init '{project_dir}' --python {py_version} && "
+                f"uv add --project '{project_dir}' pip && "
                 f"uv pip sync '{req_file}' --project '{project_dir}'"
             ) # Updated
 
