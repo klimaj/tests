@@ -274,7 +274,7 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             )
         elif environment_manager == "uv":
             cmd = (
-                f"uv run --project {reproduce_env_dir} python -u -m {module} "
+                f"uv run --project {reproduce_env_dir} --active python -u -m {module} "
                 f"--original_output_file '{original_output_file}' "
                 f"--reproduce_output_file '{reproduce_output_file}' "
             )
