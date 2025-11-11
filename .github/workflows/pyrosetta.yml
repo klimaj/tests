@@ -57,7 +57,7 @@ jobs:
           export PATH="$HOME/.pixi/bin:$PATH"
           # Add Rosetta Commons conda channel for reproduce step
           pixi config append default-channels https://conda.rosettacommons.org --global
-          pixi config get default-channels --global
+          pixi config list default-channels --global
           which python
           python --version
           python -u -m unittest pyrosetta.tests.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_pixi -v
