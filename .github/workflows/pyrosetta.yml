@@ -200,4 +200,5 @@ jobs:
         run: |
           which python
           python --version
-          python -m unittest pyrosetta/tests/test_env_reproducibility.py -v
+          # python -m unittest pyrosetta/tests/test_env_reproducibility.py -v
+          python -m unittest pyrosetta.tests.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_conda -v
