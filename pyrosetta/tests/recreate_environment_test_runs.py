@@ -20,6 +20,7 @@ def create_tasks():
 
 
 def my_protocol(packed_pose, **kwargs):
+    import math
     import pyrosetta
     import pyrosetta.distributed.io as io
     from pyrosetta.rosetta.protocols.minimization_packing import PackRotamersMover
@@ -28,7 +29,7 @@ def my_protocol(packed_pose, **kwargs):
     pose = pyrosetta.pose_from_sequence(kwargs["seq"])
 
     pose.cache["SEQUENCE"] = kwargs["seq"]
-    pose.cache["VALUE"] = complex(1, 2.4)
+    pose.cache["VALUE"] = math.pi # JSON-compatible
 
     scorefxn = pyrosetta.create_score_function("ref2015.wts")
     pack_rotamers = PackRotamersMover(
