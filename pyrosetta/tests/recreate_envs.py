@@ -378,7 +378,7 @@ def run_recreate_environment(
                 )
         """)
         subprocess.run(
-            ["uv", "run", "--project", str(reproduce_env_dir), "python", "-c", install_script],
+            ["uv", "run", "--project", str(reproduce_env_dir), "--active", "python", "-c", install_script],
             check=True,
         )
 
