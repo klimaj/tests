@@ -150,10 +150,18 @@ jobs:
         run: |
           conda install -y -n base -c conda-forge mamba
 
+      - name: Set Mamba cache
+        shell: bash -l {0}
+        run: |
+          mkdir -p $HOME/.conda/pkgs
+          export CONDA_PKGS_DIRS="$HOME/.conda/pkgs"
+          echo "CONDA_PKGS_DIRS=$CONDA_PKGS_DIRS"
+
       - name: Check Mamba
         shell: bash -l {0}
         run: |
           export PATH="/usr/share/miniconda/bin:$PATH"
+          export CONDA_PKGS_DIRS="$HOME/.conda/pkgs"
           echo "PATH=$PATH"
           which mamba
           mamba --version
@@ -162,6 +170,7 @@ jobs:
         shell: bash -l {0}
         run: |
           export PATH="/usr/share/miniconda/bin:$PATH"
+          export CONDA_PKGS_DIRS="$HOME/.conda/pkgs"
           which python
           python --version
           python -u -m unittest pyrosetta.tests.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_mamba -v
