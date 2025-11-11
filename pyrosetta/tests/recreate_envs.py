@@ -9,12 +9,21 @@ import textwrap
 from pyrosetta.distributed.cluster import recreate_environment
 
 
+ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
+
+
 def run_recreate_environment(
     env_manager,
     reproduce_env_dir,
     original_scorefile_path,
     original_decoy_name,
 ):
+    if env_manager in ("conda", "mamba"):
+        # Write .condarc file dynamically
+        os.environ["CONDARC"] = os.path.join(os.getcwd(), ".condarc")
+        with open(os.environ["CONDARC"], "w") as f:
+            f.write("channels:\n")
+            f.write(f"  - {ROSETTACOMMONS_CONDA_CHANNEL}\n")
     # Set environment manager
     os.environ["PYROSETTACLUSTER_ENVIRONMENT_MANAGER"] = env_manager
     # Setup parameters

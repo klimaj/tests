@@ -201,10 +201,10 @@ class TestEnvironmentReproducibility(unittest.TestCase):
                 cwd=original_env_dir,
             )
         elif environment_manager in ("conda", "mamba"):
-            python_bin = os.path.join(original_env_dir, "bin", "python")
+            # python_bin = os.path.join(original_env_dir, "bin", "python")
+            # f"{python_bin} -u {recreate_env_script} "
             cmd = (
-                # f"conda run -p {original_env_dir} python -u {recreate_env_script}"
-                f"{python_bin} -u {recreate_env_script} "
+                f"conda run -p {original_env_dir} python -u {recreate_env_script} "
                 f"--env_manager '{environment_manager}' "
                 f"--reproduce_env_dir '{reproduce_env_dir}' "
                 f"--original_scorefile_path '{original_scorefile_path}' "
