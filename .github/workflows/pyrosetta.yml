@@ -146,10 +146,12 @@ jobs:
           activate-environment: base
           use-mamba: true
           channel-priority: strict
+          install-mamba: true
 
       - name: Check Mamba
         shell: bash -l {0}
         run: |
+          echo "PATH=$PATH"
           which mamba
           mamba --version
 
