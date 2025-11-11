@@ -141,9 +141,8 @@ jobs:
       - name: Set up Conda with Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python-version }}
           auto-update-conda: true
-          activate-environment: base
+          activate-environment: ''
           use-mamba: true
           channel-priority: strict
 
