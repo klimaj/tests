@@ -23,8 +23,8 @@ class TestAtomCoordinates(unittest.TestCase):
                     )
     
     def test_coordinates(self):
-        original_pose = io.pose_from_file(self.original_output_file)
-        reproduce_pose = io.pose_from_file(self.reproduce_output_file)
+        original_pose = io.pose_from_file(self.original_output_file).pose
+        reproduce_pose = io.pose_from_file(self.reproduce_output_file).pose
         self.assert_atom_coordinates(original_pose, reproduce_pose)
 
 
