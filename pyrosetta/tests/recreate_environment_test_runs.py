@@ -35,7 +35,7 @@ def get_yml() -> str:
         "conda": f"conda env export --prefix '{sys.prefix}'",
     }
     env_manager = get_environment_manager()
-    if env_manager == "pixi":
+    if env_manager == "pixi": # Updated
         environment_cmd = "pixi lock --check || pixi lock --no-install"
         print(f"Running environment command: `{environment_cmd}`")
         subprocess.run(environment_cmd, shell=True, check=True)
