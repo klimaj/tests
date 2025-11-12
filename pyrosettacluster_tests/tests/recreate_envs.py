@@ -149,6 +149,16 @@ class EnvironmentConfig(Generic[G]):
 
         elif self.environment_manager == "pixi": # Updated
             subprocess.run(f"pixi init '{project_dir}'", shell=True, stderr=subprocess.STDOUT)
+            toml_file = os.path.join(project_dir, "pixi.toml")
+            if not os.path.isfile(toml_file):
+                print("Pixi init did not write pixi.toml. Writing now...")
+                tmol_data = textwrap.dedent("""name = "test-project"
+                    version = "0.1.0"
+                    channels = ["conda-forge"]
+                    platforms = ["linux-64"]
+                """)
+                with open(toml_file, "w") as f:
+                    f.write(tmol_data)
             lock_file = os.path.join(project_dir, "pixi.lock")
             with open(lock_file, "w") as f:
                 f.write(raw_spec)
@@ -349,9 +359,9 @@ def recreate_environment(
         output = _run_subprocess(env_create_cmd, cwd=env_dir) # Updated
 
         if environment_manager == "pixi":
-            lock_file = os.path.join(env_dir, "pixi.lock")
-            with open(lock_file, "r") as f:
-                print("Written pixi.lock file:\n", f.read(), "\n------\n")
+            # lock_file = os.path.join(env_dir, "pixi.lock")
+            # with open(lock_file, "r") as f:
+            #     print("Written pixi.lock file:\n", f.read(), "\n------\n")
             toml_file = os.path.join(env_dir, "pixi.toml")
             with open(toml_file, "r") as f:
                 print("Written pixi.toml file:\n", f.read(), "\n------\n")
