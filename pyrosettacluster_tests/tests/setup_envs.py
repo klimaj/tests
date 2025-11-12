@@ -108,9 +108,31 @@ def setup_uv_environment(env_dir):
     )
 
     # Install pyrosetta-installer
-    print("Adding 'pyrosetta-installer' and 'pip' to uv environment...")
+    print("Adding 'pyrosetta-installer', 'pip', and `pyrosetta.distributed` depedencies to uv environment...")
     subprocess.run(
-        ["uv", "add", "--project", str(env_path), "pyrosetta-installer", "pip"],
+        [
+            "uv",
+            "add",
+            "--project", str(env_path),
+            "pyrosetta-installer>=0.1.2",
+            "pip>=25.3",
+            "attrs>=19.3.0",
+            "billiard>=3.6.3.0",
+            "blosc>=1.8.3",
+            "cloudpickle>=1.5.0",
+            "cryptography>=2.8",
+            "dask>=2.16.0",
+            "dask-jobqueue>=0.7.0",
+            "distributed>=2.16.0",
+            "gitpython>=3.1.1",
+            "jupyter>=1.0.0",
+            "numpy>=1.17.3",
+            "pandas>=0.25.2",
+            "py3Dmol>=0.8.0",
+            "python-xz>=0.4.0",
+            "scipy>=1.4.1",
+            "traitlets>=4.3.3",
+        ],
         check=True,
         cwd=str(env_path),
     )
@@ -121,17 +143,17 @@ def setup_uv_environment(env_dir):
         import pyrosetta_installer
         try:
             pyrosetta_installer.install_pyrosetta(
-                distributed=True,
+                distributed=False,
                 serialization=True,
-                skip_if_installed=True,
+                skip_if_installed=False,
                 mirror=0
             )
         except Exception as e:
             print(f"PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
             pyrosetta_installer.install_pyrosetta(
-                distributed=True,
+                distributed=False,
                 serialization=True,
-                skip_if_installed=True,
+                skip_if_installed=False,
                 mirror=1
             )
     """)
