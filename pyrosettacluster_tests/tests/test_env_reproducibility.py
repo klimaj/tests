@@ -289,8 +289,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             )
         elif environment_manager == "uv":
             cmd = (
-                # f"uv run --project {reproduce_env_dir} python -u -m {module} "
-                f"{reproduce_env_dir}/.venv/bin/python -u -m {module} "
+                f"uv run --project {reproduce_env_dir} python -u -m {module} "
+                # f"{reproduce_env_dir}/.venv/bin/python -u -m {module} "
                 f"--env_manager '{environment_manager}' "
                 f"--output_path '{reproduce_output_path}' "
                 f"--scorefile_name '{reproduce_scorefile_name}' "
@@ -374,8 +374,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             )
         elif environment_manager == "uv":
             cmd = (
-                # f"uv run --project {reproduce_env_dir} python -u -m {module} "
-                f"{reproduce_env_dir}/.venv/bin/python -u -m {module} "
+                f"uv run --project {reproduce_env_dir} python -u -m {module} "
+                # f"{reproduce_env_dir}/.venv/bin/python -u -m {module} "
                 f"--original_output_file '{original_output_file}' "
                 f"--reproduce_output_file '{reproduce_output_file}' "
             )

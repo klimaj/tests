@@ -150,16 +150,16 @@ class EnvironmentConfig(Generic[G]):
 
         elif self.environment_manager == "pixi": # Updated
             subprocess.run(f"pixi init '{project_dir}'", shell=True, stderr=subprocess.STDOUT)
-            toml_file = os.path.join(project_dir, "pixi.toml")
-            if not os.path.isfile(toml_file):
-                print("Pixi init did not write pixi.toml. Writing now...")
-                tmol_data = textwrap.dedent("""name = "test-project"
-                    version = "0.1.0"
-                    channels = ["conda-forge"]
-                    platforms = ["linux-64"]
-                """)
-                with open(toml_file, "w") as f:
-                    f.write(tmol_data)
+            # toml_file = os.path.join(project_dir, "pixi.toml")
+            # if not os.path.isfile(toml_file):
+            #     print("Pixi init did not write pixi.toml. Writing now...")
+            #     tmol_data = textwrap.dedent("""name = "test-project"
+            #         version = "0.1.0"
+            #         channels = ["conda-forge"]
+            #         platforms = ["linux-64"]
+            #     """)
+            #     with open(toml_file, "w") as f:
+            #         f.write(tmol_data)
             lock_file = os.path.join(project_dir, "pixi.lock")
             with open(lock_file, "w") as f:
                 f.write(raw_spec)
