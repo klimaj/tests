@@ -39,6 +39,13 @@ def get_yml() -> str:
     Run environment export command to return a YML file string with the current virtual
     environment, excluding certain source domains.
     """
+    def remove_comments(text: str) -> str:
+        """Remove lines starting with '#' from a requirements.txt file string."""
+        return "\n".join(
+            line for line in text.splitlines()
+            if not line.strip().startswith("#")
+        )
+
     _ENV_EXPORT_CMDS = {
         # "pixi": "pixi lock --check || (echo 'Regenerating pixi.lock file...' && pixi lock --no-install); cat pixi.lock", # Updated
         "uv": "uv export --format requirements-txt --frozen",
@@ -84,6 +91,9 @@ def get_yml() -> str:
             if raw_yml
             else raw_yml
         )
+
+    if env_manager == "uv":
+        yml = remove_comments(yml)
 
     # print("Generated YML string:")
     # print("#" * 100)
