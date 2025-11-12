@@ -9,6 +9,7 @@ print("sys.executable:", sys.executable)
 print("sys.path:")
 for p in sys.path:
     print(" ", p)
+print("CWD:", os.getcwd())
 print("### Debug")
 
 import argparse
