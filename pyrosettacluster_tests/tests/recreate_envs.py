@@ -34,6 +34,9 @@ from typing import (
 
 # from pyrosetta.distributed.cluster.tools import get_instance_kwargs
 
+ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
+
+
 G = TypeVar("G")
 
 def get_instance_kwargs(scorefile, decoy_name):
@@ -149,7 +152,7 @@ class EnvironmentConfig(Generic[G]):
             ) # Updated
 
         elif self.environment_manager == "pixi": # Updated
-            subprocess.run(f"pixi init '{project_dir}'", shell=True, stderr=subprocess.STDOUT)
+            # subprocess.run(f"pixi init '{project_dir}'", shell=True, stderr=subprocess.STDOUT)
             # toml_file = os.path.join(project_dir, "pixi.toml")
             # if not os.path.isfile(toml_file):
             #     print("Pixi init did not write pixi.toml. Writing now...")
@@ -160,6 +163,56 @@ class EnvironmentConfig(Generic[G]):
             #     """)
             #     with open(toml_file, "w") as f:
             #         f.write(tmol_data)
+                # Detect Python version
+
+            def detect_platform():
+                """Detect system platform string used by GitHub Actions."""
+                import platform
+
+                system = platform.system().lower()
+                machine = platform.machine().lower()
+
+                if system == "linux":
+                    plat = "linux-64" if "64" in machine else "linux-32"
+                elif system == "darwin":
+                    plat = "osx-arm64" if "arm" in machine else "osx-64"
+                elif system == "windows":
+                    plat = "win-64"
+                else:
+                    raise RuntimeError(f"Unsupported platform: {system} ({machine})")
+
+                return plat
+
+            py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+            py_feature = f"py{sys.version_info.major}{sys.version_info.minor}"
+
+            # Detect platform
+            plat = detect_platform()
+
+            # Build 'pixi.toml' file dynamically
+            pixi_toml = textwrap.dedent(f"""
+            [workspace]
+            channels = ["{ROSETTACOMMONS_CONDA_CHANNEL}", "conda-forge"]
+            name = "{environment_name}"
+            platforms = ["{plat}"]
+            version = "1.0.0"
+
+            [dependencies]
+            pyrosetta = "*"
+
+            [pypi-dependencies]
+            pyrosetta-distributed = "*"
+
+            [feature.{py_feature}.dependencies]
+            python = "{py_version}.*"
+
+            [environments]
+            {py_feature} = ["{py_feature}"]
+            """)
+            os.makedirs(project_dir, exist_ok=False)
+            toml_file = os.path.join(project_dir, "pixi.toml")
+            with open(toml_file, "w") as f:
+                f.write(pixi_toml)
             lock_file = os.path.join(project_dir, "pixi.lock")
             with open(lock_file, "w") as f:
                 f.write(raw_spec)
@@ -377,7 +430,6 @@ def recreate_environment(
         )
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
 
 
 def run_recreate_environment(

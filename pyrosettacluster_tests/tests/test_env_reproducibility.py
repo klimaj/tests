@@ -242,6 +242,12 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             pixi_envs_dir = os.path.join(reproduce_env_dir, ".pixi", "envs")
             if os.path.isdir(pixi_envs_dir):
                 print("Reproduced environment .pixi/envs files:", os.listdir(pixi_envs_dir))
+            pixi_envs_default_dir = os.path.join(reproduce_env_dir, ".pixi", "envs", "default")
+            if os.path.isdir(pixi_envs_default_dir):
+                print("Reproduced environment .pixi/envs/default files:", os.listdir(pixi_envs_default_dir))
+            pixi_envs_default_bin_dir = os.path.join(reproduce_env_dir, ".pixi", "envs", "default", "bin")
+            if os.path.isdir(pixi_envs_default_bin_dir):
+                print("Reproduced environment .pixi/envs/default/bin files:", os.listdir(pixi_envs_default_bin_dir))
 
             def pixi_which_python(project_dir):
                 cmd = ["pixi", "run", "which", "python"]
