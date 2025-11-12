@@ -85,10 +85,10 @@ def get_yml() -> str:
             else raw_yml
         )
 
-    print("Generated YML string:")
-    print("#" * 100)
-    print(yml)
-    print("#" * 100)
+    # print("Generated YML string:")
+    # print("#" * 100)
+    # print(yml)
+    # print("#" * 100)
 
     return yml
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
