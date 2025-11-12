@@ -212,12 +212,12 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         module = os.path.splitext(os.path.basename(test_script))[0]
         # module = "pyrosettacluster_tests.tests.recreate_environment_test_runs"
 
-        def find_test_root(start_path):
-            path = Path(start_path).resolve()
-            for parent in path.parents:
-                if parent.name == "pyrosettacluster_tests":
-                    return parent
-            raise FileNotFoundError(f"Could not find 'pyrosetta' root directory from: '{start_path}'")
+        # def find_test_root(start_path):
+        #     path = Path(start_path).resolve()
+        #     for parent in path.parents:
+        #         if parent.name == "pyrosettacluster_tests":
+        #             return parent
+        #     raise FileNotFoundError(f"Could not find 'pyrosetta' root directory from: '{start_path}'")
 
         # print("Reproduced environment directory files:", os.listdir(reproduce_env_dir))
         # if environment_manager == "uv":
@@ -272,9 +272,9 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         #     print("Reproduced environment sys.path:", sys_path)
 
 
-        src_test_root = find_test_root(__file__)
-        dst_test_root = os.path.join(reproduce_env_dir, "pyrosettacluster_tests")
-        shutil.copytree(src_test_root, dst_test_root, dirs_exist_ok=True)
+        # src_test_root = find_test_root(__file__)
+        # dst_test_root = os.path.join(reproduce_env_dir, "pyrosettacluster_tests")
+        # shutil.copytree(src_test_root, dst_test_root, dirs_exist_ok=True)
 
         if environment_manager == "pixi":
             cmd = (
@@ -287,13 +287,13 @@ class TestEnvironmentReproducibility(unittest.TestCase):
                 f"--original_decoy_name '{original_decoy_name}' "
                 "--reproduce"
             )
-            returncode = TestEnvironmentReproducibility.run_subprocess(
-                cmd,
-                # module_dir=reproduce_env_dir,
-                module_dir=os.path.dirname(test_script),
-                # For pixi, activate the recreated pixi environment context
-                cwd=reproduce_env_dir,
-            )
+            # returncode = TestEnvironmentReproducibility.run_subprocess(
+            #     cmd,
+            #     # module_dir=reproduce_env_dir,
+            #     module_dir=os.path.dirname(test_script),
+            #     # For pixi, activate the recreated pixi environment context
+            #     cwd=reproduce_env_dir,
+            # )
         elif environment_manager == "uv":
             cmd = (
                 f"uv run --project {reproduce_env_dir} python -u -m {module} "
@@ -305,13 +305,13 @@ class TestEnvironmentReproducibility(unittest.TestCase):
                 f"--original_decoy_name '{original_decoy_name}' "
                 "--reproduce"
             )
-            returncode = TestEnvironmentReproducibility.run_subprocess(
-                cmd,
-                # module_dir=reproduce_env_dir,
-                module_dir=os.path.dirname(test_script),
-                # For uv, activate the recreated uv environment context
-                cwd=reproduce_env_dir,
-            )
+            # returncode = TestEnvironmentReproducibility.run_subprocess(
+            #     cmd,
+            #     # module_dir=reproduce_env_dir,
+            #     module_dir=os.path.dirname(test_script),
+            #     # For uv, activate the recreated uv environment context
+            #     cwd=reproduce_env_dir,
+            # )
         elif environment_manager in ("conda", "mamba"):
             cmd = (
                 f"conda run -p {reproduce_env_dir} python -u -m {module} "
@@ -322,12 +322,12 @@ class TestEnvironmentReproducibility(unittest.TestCase):
                 f"--original_decoy_name '{original_decoy_name}' "
                 "--reproduce"
             )
-            returncode = TestEnvironmentReproducibility.run_subprocess(
-                cmd,
-                module_dir=os.path.dirname(test_script),
-                # For conda/mamba, run from recreated environment directory for consistency with pixi/uv workflows
-                cwd=reproduce_env_dir,
-            )
+        returncode = TestEnvironmentReproducibility.run_subprocess(
+            cmd,
+            module_dir=os.path.dirname(test_script),
+            # For conda/mamba, run from recreated environment directory for consistency with pixi/uv workflows
+            cwd=reproduce_env_dir,
+        )
         self.assertEqual(returncode, 0, msg=f"Subprocess command failed: {cmd}")
 
         # Validate reproduced decoy is identical to original decoy

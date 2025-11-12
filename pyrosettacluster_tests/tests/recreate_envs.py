@@ -413,10 +413,10 @@ def recreate_environment(
             # lock_file = os.path.join(env_dir, "pixi.lock")
             # with open(lock_file, "r") as f:
             #     print("Written pixi.lock file:\n", f.read(), "\n------\n")
-            toml_file = os.path.join(env_dir, "pixi.toml")
-            with open(toml_file, "r") as f:
-                print("Written pixi.toml file:\n", f.read(), "\n------\n")
-            print(f"Running environment create command: `{env_create_cmd}`")
+            # toml_file = os.path.join(env_dir, "pixi.toml")
+            # with open(toml_file, "r") as f:
+            #     print("Written pixi.toml file:\n", f.read(), "\n------\n")
+            # print(f"Running environment create command: `{env_create_cmd}`")
             env = os.environ.copy()
             env["PIXI_FROZEN"] = "true"
             output = _run_subprocess(env_create_cmd, cwd=env_dir, env=env) # Updated
