@@ -3,7 +3,6 @@ __author__ = "Jason C. Klima"
 
 import argparse
 import os
-import platform
 import subprocess
 import sys
 import tempfile
@@ -11,25 +10,10 @@ import textwrap
 
 from pathlib import Path
 
-
-ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
-
-
-def detect_platform():
-    """Detect system platform string used by GitHub Actions."""
-    system = platform.system().lower()
-    machine = platform.machine().lower()
-
-    if system == "linux":
-        plat = "linux-64" if "64" in machine else "linux-32"
-    elif system == "darwin":
-        plat = "osx-arm64" if "arm" in machine else "osx-64"
-    elif system == "windows":
-        plat = "win-64"
-    else:
-        raise RuntimeError(f"Unsupported platform: {system} ({machine})")
-
-    return plat
+from pyrosettacluster_tests.utils import (
+    ROSETTACOMMONS_CONDA_CHANNEL,
+    detect_platform,
+)
 
 
 def setup_pixi_environment(env_dir):

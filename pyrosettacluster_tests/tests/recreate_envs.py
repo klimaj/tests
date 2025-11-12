@@ -34,8 +34,11 @@ from typing import (
 
 # from pyrosetta.distributed.cluster.tools import get_instance_kwargs
 
-ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
-
+# ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
+from pyrosettacluster_tests.utils import (
+    ROSETTACOMMONS_CONDA_CHANNEL,
+    detect_platform,
+)
 
 G = TypeVar("G")
 
@@ -165,23 +168,23 @@ class EnvironmentConfig(Generic[G]):
             #         f.write(tmol_data)
                 # Detect Python version
 
-            def detect_platform():
-                """Detect system platform string used by GitHub Actions."""
-                import platform
+            # def detect_platform():
+            #     """Detect system platform string used by GitHub Actions."""
+            #     import platform
 
-                system = platform.system().lower()
-                machine = platform.machine().lower()
+            #     system = platform.system().lower()
+            #     machine = platform.machine().lower()
 
-                if system == "linux":
-                    plat = "linux-64" if "64" in machine else "linux-32"
-                elif system == "darwin":
-                    plat = "osx-arm64" if "arm" in machine else "osx-64"
-                elif system == "windows":
-                    plat = "win-64"
-                else:
-                    raise RuntimeError(f"Unsupported platform: {system} ({machine})")
+            #     if system == "linux":
+            #         plat = "linux-64" if "64" in machine else "linux-32"
+            #     elif system == "darwin":
+            #         plat = "osx-arm64" if "arm" in machine else "osx-64"
+            #     elif system == "windows":
+            #         plat = "win-64"
+            #     else:
+            #         raise RuntimeError(f"Unsupported platform: {system} ({machine})")
 
-                return plat
+            #     return plat
 
             py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
             py_feature = f"py{sys.version_info.major}{sys.version_info.minor}"
