@@ -195,7 +195,7 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         reproduce_output_path = os.path.join(reproduce_env_dir, f"{environment_manager}_reproduce_outputs")
         reproduce_scorefile_name = "test_scores.json"
         # module = os.path.splitext(os.path.basename(test_script))[0]
-        module = "pyrosetta.tests.recreate_environment_test_runs"
+        module = "pyrosettacluster_tests.tests.recreate_environment_test_runs"
 
         def find_test_root(start_path):
             path = Path(start_path).resolve()
