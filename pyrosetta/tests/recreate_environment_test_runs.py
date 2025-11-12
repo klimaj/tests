@@ -46,7 +46,7 @@ def get_yml() -> str:
     except subprocess.CalledProcessError:
         raw_yml = ""
 
-    return (
+    yml = (
         (
             os.linesep.join(
                 # [f"# {get_environment_var()}={get_environment_manager()}"]
@@ -66,6 +66,13 @@ def get_yml() -> str:
         if raw_yml
         else raw_yml
     )
+
+    print("Generated YML string:")
+    print("#" * 100)
+    print(yml)
+    print("#" * 100)
+
+    return yml
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 def create_tasks():
