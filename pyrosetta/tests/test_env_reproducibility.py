@@ -192,7 +192,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         # Run reproduction simulation inside recreated environment
         reproduce_output_path = os.path.join(reproduce_env_dir, f"{environment_manager}_reproduce_outputs")
         reproduce_scorefile_name = "test_scores.json"
-        module = os.path.splitext(os.path.basename(test_script))[0]
+        # module = os.path.splitext(os.path.basename(test_script))[0]
+        module = "pyrosetta.tests.recreate_environment_test_runs"
         if environment_manager == "pixi":
             cmd = (
                 f"pixi run python -u -m {module} "
@@ -226,7 +227,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             )
         returncode = TestEnvironmentReproducibility.run_subprocess(
             cmd,
-            module_dir=os.path.dirname(test_script),
+            module_dir=None,
+            # module_dir=os.path.dirname(test_script),
             # For pixi, activate the recreated pixi environment context
             # For conda/mamba/uv, run from recreated environment directory for consistency with pixi workflow
             cwd=reproduce_env_dir,
