@@ -143,8 +143,9 @@ class EnvironmentConfig(Generic[G]):
             py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
             return (
                 f"uv init '{project_dir}' --python {py_version} && "
-                f"uv add --project '{project_dir}' pip && "
-                f"uv pip sync '{req_file}' --project '{project_dir}'"
+                # f"uv add --project '{project_dir}' pip && "
+                # f"uv pip sync '{req_file}' --project '{project_dir}'"
+                f"uv add --requirements '{req_file}' --project '{project_dir}'"
             ) # Updated
 
         elif self.environment_manager == "pixi": # Updated
