@@ -43,18 +43,6 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             env = None
         cmd_list = shlex.split(cmd)
         try:
-            # Use live output streaming for GitHub Actions visibility
-            process = subprocess.Popen(
-                cmd_list,
-                cwd=cwd,
-                env=env,
-                shell=False,
-                stdout=sys.stdout,
-                stderr=sys.stderr,
-                text=True,
-            )
-            returncode = process.wait()
-
             if live_output:
                 # Use live output streaming for GitHub Actions visibility
                 process = subprocess.Popen(
