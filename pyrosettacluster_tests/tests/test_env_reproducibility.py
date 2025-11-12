@@ -273,7 +273,7 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         if environment_manager == "pixi":
             cmd = (
                 # f"pixi run python -u -m {module} "
-                f"{reproduce_env_dir}/.pixi/default/bin/python -u -m {module} "
+                f"{reproduce_env_dir}/.pixi/envs/default/bin/python -u -m {module} "
                 f"--env_manager '{environment_manager}' "
                 f"--output_path '{reproduce_output_path}' "
                 f"--scorefile_name '{reproduce_scorefile_name}' "
@@ -368,7 +368,7 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         if environment_manager == "pixi":
             cmd = (
                 # f"pixi run python -u -m {module} "
-                f"{reproduce_env_dir}/.pixi/default/bin/python -u -m {module} "
+                f"{reproduce_env_dir}/.pixi/envs/default/bin/python -u -m {module} "
                 f"--original_output_file '{original_output_file}' "
                 f"--reproduce_output_file '{reproduce_output_file}' "
             )
