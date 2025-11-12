@@ -180,6 +180,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             f"Reproduced '{environment_manager}' environment directory was not created: '{reproduce_env_dir}'",
         )
 
+        print("Reproduced environment directory files:", os.listdir(reproduce_env_dir))
+
         # Run reproduction simulation inside recreated environment
         reproduce_output_path = os.path.join(reproduce_env_dir, f"{environment_manager}_reproduce_outputs")
         reproduce_scorefile_name = "test_scores.json"
@@ -196,7 +198,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             )
         elif environment_manager == "uv":
             cmd = (
-                f"uv run --project {reproduce_env_dir} python -u -m {module} "
+                # f"uv run --project {reproduce_env_dir} python -u -m {module} "
+                f"{reproduce_env_dir}/.venv/bin/activate && python -u -m {module} "
                 f"--env_manager '{environment_manager}' "
                 f"--output_path '{reproduce_output_path}' "
                 f"--scorefile_name '{reproduce_scorefile_name}' "
@@ -274,7 +277,8 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             )
         elif environment_manager == "uv":
             cmd = (
-                f"uv run --project {reproduce_env_dir} python -u -m {module} "
+                # f"uv run --project {reproduce_env_dir} python -u -m {module} "
+                f"{reproduce_env_dir}/.venv/bin/activate && python -u -m {module} "
                 f"--original_output_file '{original_output_file}' "
                 f"--reproduce_output_file '{reproduce_output_file}' "
             )
