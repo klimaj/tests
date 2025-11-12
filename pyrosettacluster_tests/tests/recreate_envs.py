@@ -9,6 +9,7 @@ import textwrap
 # from pyrosetta.distributed.cluster import recreate_environment
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+import json
 import logging
 import os
 import shutil
@@ -31,9 +32,33 @@ from typing import (
     Union,
 )
 
-from pyrosetta.distributed.cluster.tools import get_instance_kwargs
+# from pyrosetta.distributed.cluster.tools import get_instance_kwargs
 
 G = TypeVar("G")
+
+def get_instance_kwargs(scorefile, decoy_name):
+    instance_kwargs = None
+    if scorefile.endswith(".json"):
+        with open(scorefile, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                try:
+                    scorefile_entry = json.loads(line)
+                except:
+                    raise TypeError(
+                        "`get_instance_kwargs()` received `scorefile` which does not appear to be JSON-formatted."
+                    )
+                if all(k in scorefile_entry for k in ("metadata", "instance")):
+                    if "decoy_name" in scorefile_entry["metadata"]:
+                        if scorefile_entry["metadata"]["decoy_name"] == decoy_name:
+                            instance_kwargs = scorefile_entry["instance"]
+                            break
+                else:
+                    raise NotImplementedError("Could not locate decoy.")
+    assert instance_kwargs is not None, instance_kwargs
+
+    return instance_kwargs
+
 
 class EnvironmentConfig(Generic[G]):
     _ENV_VAR: str = "PYROSETTACLUSTER_ENVIRONMENT_MANAGER"
@@ -215,8 +240,6 @@ def recreate_environment(
         None
     """
     def _run_subprocess(cmd, cwd=None) -> str:
-        env = os.environ.copy()
-        env.pop("PYTHONPATH", None)
         try:
             return subprocess.check_output(
                 cmd,
@@ -225,7 +248,7 @@ def recreate_environment(
                 timeout=timeout,
                 text=True,
                 cwd=cwd,
-                env=env,
+                env=None,
                 executable="/bin/bash", # Ensure `&&` works properly
             )
         except subprocess.CalledProcessError as ex:
@@ -258,12 +281,7 @@ def recreate_environment(
     environment_var = get_environment_var()
 
     # Extract environment spec from record
-    _instance_kwargs = get_instance_kwargs(
-        input_file=input_file,
-        scorefile=scorefile,
-        decoy_name=decoy_name,
-        skip_corrections=None,
-    )
+    _instance_kwargs = get_instance_kwargs(scorefile, decoy_name)
     if "environment" not in _instance_kwargs:
         raise RuntimeError(
             "PyRosettaCluster 'environment' instance attribute does not exist. "
