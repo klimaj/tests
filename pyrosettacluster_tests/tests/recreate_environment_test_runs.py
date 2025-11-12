@@ -3,14 +3,14 @@ __author__ = "Jason C. Klima"
 import os
 import sys
 
-print("### Debug")
-print("PYTHONPATH:", os.environ.get("PYTHONPATH"))
-print("sys.executable:", sys.executable)
-print("sys.path:")
-for p in sys.path:
-    print(" ", p)
-print("CWD:", os.getcwd())
-print("### Debug")
+# print("### Debug")
+# print("PYTHONPATH:", os.environ.get("PYTHONPATH"))
+# print("sys.executable:", sys.executable)
+# print("sys.path:")
+# for p in sys.path:
+#     print(" ", p)
+# print("CWD:", os.getcwd())
+# print("### Debug")
 
 import argparse
 import os
@@ -228,10 +228,10 @@ def run_reproduce_simulation(
     # Set environment manager
     os.environ["PYROSETTACLUSTER_ENVIRONMENT_MANAGER"] = env_manager
 
-    print("*" * 50)
-    print("Reproduced environment environment file:")
-    print(get_yml())
-    print("*" * 50)
+    # print("*" * 50)
+    # print("Reproduced environment environment file:")
+    # print(get_yml())
+    # print("*" * 50)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         # Setup simulation

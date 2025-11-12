@@ -158,10 +158,10 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         self.assertIn("decoy_name", original_record["metadata"])
         original_decoy_name = original_record["metadata"]["decoy_name"]
 
-        print("*" * 50)
-        print("Cached environment file:")
-        print(original_record["instance"]["environment"])
-        print("*" * 50)
+        # print("*" * 50)
+        # print("Cached environment file:")
+        # print(original_record["instance"]["environment"])
+        # print("*" * 50)
 
         # Recreate environment
         reproduce_env_name = f"{original_env_name}_reproduce"
@@ -219,57 +219,57 @@ class TestEnvironmentReproducibility(unittest.TestCase):
                     return parent
             raise FileNotFoundError(f"Could not find 'pyrosetta' root directory from: '{start_path}'")
 
-        print("Reproduced environment directory files:", os.listdir(reproduce_env_dir))
-        if environment_manager == "uv":
-            venv_dir = os.path.join(reproduce_env_dir, ".venv")
-            if os.path.isdir(venv_dir):
-                print("Reproduced environment .venv files:", os.listdir(venv_dir))
-            bin_dir = os.path.join(reproduce_env_dir, ".venv", "bin")
-            if os.path.isdir(bin_dir):
-                print("Reproduced environment .venv/bin files:", os.listdir(bin_dir))
-            pyproject_toml = os.path.join(reproduce_env_dir, "pyproject.toml")
-            if os.path.isfile(pyproject_toml):
-                with open(pyproject_toml, "r") as f:
-                    print("Reproduced environment pyproject_toml.toml file:", f.read())
-        elif environment_manager == "pixi":
-            pixi_toml = os.path.join(reproduce_env_dir, "pixi.toml")
-            if os.path.isfile(pixi_toml):
-                with open(pixi_toml, "r") as f:
-                    print("Reproduced environment pixi.toml file:", f.read())
-            pixi_dir = os.path.join(reproduce_env_dir, ".pixi")
-            if os.path.isdir(pixi_dir):
-                print("Reproduced environment .pixi files:", os.listdir(pixi_dir))
-            pixi_envs_dir = os.path.join(reproduce_env_dir, ".pixi", "envs")
-            if os.path.isdir(pixi_envs_dir):
-                print("Reproduced environment .pixi/envs files:", os.listdir(pixi_envs_dir))
-            pixi_envs_default_dir = os.path.join(reproduce_env_dir, ".pixi", "envs", "default")
-            if os.path.isdir(pixi_envs_default_dir):
-                print("Reproduced environment .pixi/envs/default files:", os.listdir(pixi_envs_default_dir))
-            pixi_envs_default_bin_dir = os.path.join(reproduce_env_dir, ".pixi", "envs", "default", "bin")
-            if os.path.isdir(pixi_envs_default_bin_dir):
-                print("Reproduced environment .pixi/envs/default/bin files:", os.listdir(pixi_envs_default_bin_dir))
+        # print("Reproduced environment directory files:", os.listdir(reproduce_env_dir))
+        # if environment_manager == "uv":
+        #     venv_dir = os.path.join(reproduce_env_dir, ".venv")
+        #     if os.path.isdir(venv_dir):
+        #         print("Reproduced environment .venv files:", os.listdir(venv_dir))
+        #     bin_dir = os.path.join(reproduce_env_dir, ".venv", "bin")
+        #     if os.path.isdir(bin_dir):
+        #         print("Reproduced environment .venv/bin files:", os.listdir(bin_dir))
+        #     pyproject_toml = os.path.join(reproduce_env_dir, "pyproject.toml")
+        #     if os.path.isfile(pyproject_toml):
+        #         with open(pyproject_toml, "r") as f:
+        #             print("Reproduced environment pyproject_toml.toml file:", f.read())
+        # elif environment_manager == "pixi":
+        #     pixi_toml = os.path.join(reproduce_env_dir, "pixi.toml")
+        #     if os.path.isfile(pixi_toml):
+        #         with open(pixi_toml, "r") as f:
+        #             print("Reproduced environment pixi.toml file:", f.read())
+        #     pixi_dir = os.path.join(reproduce_env_dir, ".pixi")
+        #     if os.path.isdir(pixi_dir):
+        #         print("Reproduced environment .pixi files:", os.listdir(pixi_dir))
+        #     pixi_envs_dir = os.path.join(reproduce_env_dir, ".pixi", "envs")
+        #     if os.path.isdir(pixi_envs_dir):
+        #         print("Reproduced environment .pixi/envs files:", os.listdir(pixi_envs_dir))
+        #     pixi_envs_default_dir = os.path.join(reproduce_env_dir, ".pixi", "envs", "default")
+        #     if os.path.isdir(pixi_envs_default_dir):
+        #         print("Reproduced environment .pixi/envs/default files:", os.listdir(pixi_envs_default_dir))
+        #     pixi_envs_default_bin_dir = os.path.join(reproduce_env_dir, ".pixi", "envs", "default", "bin")
+        #     if os.path.isdir(pixi_envs_default_bin_dir):
+        #         print("Reproduced environment .pixi/envs/default/bin files:", os.listdir(pixi_envs_default_bin_dir))
 
-            def pixi_which_python(project_dir):
-                cmd = ["pixi", "run", "which", "python"]
-                result = subprocess.run(cmd, cwd=project_dir, capture_output=True, text=True, check=True)
-                return result.stdout.strip()
+        #     def pixi_which_python(project_dir):
+        #         cmd = ["pixi", "run", "which", "python"]
+        #         result = subprocess.run(cmd, cwd=project_dir, capture_output=True, text=True, check=True)
+        #         return result.stdout.strip()
 
-            def pixi_python_sys(project_dir):
-                code = "import sys; print(sys.executable); print(sys.path)"
-                cmd = ["pixi", "run", "python", "-c", code]
-                result = subprocess.run(cmd, cwd=project_dir, capture_output=True, text=True, check=True)
-                lines = result.stdout.strip().splitlines()
-                executable = lines[0]
-                # Evaluate the printed list safely
-                path_list = eval(lines[1])
-                return executable, path_list
+        #     def pixi_python_sys(project_dir):
+        #         code = "import sys; print(sys.executable); print(sys.path)"
+        #         cmd = ["pixi", "run", "python", "-c", code]
+        #         result = subprocess.run(cmd, cwd=project_dir, capture_output=True, text=True, check=True)
+        #         lines = result.stdout.strip().splitlines()
+        #         executable = lines[0]
+        #         # Evaluate the printed list safely
+        #         path_list = eval(lines[1])
+        #         return executable, path_list
 
-            python_executable = pixi_which_python(reproduce_env_dir)
-            print("Reproduced environment Pixi Python executable:", python_executable)
+        #     python_executable = pixi_which_python(reproduce_env_dir)
+        #     print("Reproduced environment Pixi Python executable:", python_executable)
 
-            executable, sys_path = pixi_python_sys(reproduce_env_dir)
-            print("Reproduced environment sys.executable:", executable)
-            print("Reproduced environment sys.path:", sys_path)
+        #     executable, sys_path = pixi_python_sys(reproduce_env_dir)
+        #     print("Reproduced environment sys.executable:", executable)
+        #     print("Reproduced environment sys.path:", sys_path)
 
 
         src_test_root = find_test_root(__file__)
@@ -323,7 +323,7 @@ class TestEnvironmentReproducibility(unittest.TestCase):
             returncode = TestEnvironmentReproducibility.run_subprocess(
                 cmd,
                 module_dir=os.path.dirname(test_script),
-                # For conda/mamba, run from recreated environment directory for consistency with pixi workflow
+                # For conda/mamba, run from recreated environment directory for consistency with pixi/uv workflows
                 cwd=reproduce_env_dir,
             )
         self.assertEqual(returncode, 0, msg=f"Subprocess command failed: {cmd}")
