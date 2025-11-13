@@ -6,6 +6,8 @@ import os
 import subprocess
 import textwrap
 
+from pathlib import Path
+
 # from pyrosetta.distributed.cluster import recreate_environment
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -487,32 +489,35 @@ def run_recreate_environment(
         # uv environment recreation after the original uv environment creation.
         print("Running PyRosetta installer in recreated uv environment...")
         # Run PyRosetta installer with mirror fallback
-        install_script = textwrap.dedent("""
-            import pyrosetta_installer
-            try:
-                pyrosetta_installer.install_pyrosetta(
-                    distributed=False,
-                    serialization=True,
-                    skip_if_installed=False,
-                    mirror=0
-                )
-            except Exception as e:
-                print(f"Recreated PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
-                pyrosetta_installer.install_pyrosetta(
-                    distributed=False,
-                    serialization=True,
-                    skip_if_installed=False,
-                    mirror=1
-                )
-        """)
+        # install_script = textwrap.dedent("""
+        #     import pyrosetta_installer
+        #     try:
+        #         pyrosetta_installer.install_pyrosetta(
+        #             distributed=False,
+        #             serialization=True,
+        #             skip_if_installed=False,
+        #             mirror=0
+        #         )
+        #     except Exception as e:
+        #         print(f"Recreated PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
+        #         pyrosetta_installer.install_pyrosetta(
+        #             distributed=False,
+        #             serialization=True,
+        #             skip_if_installed=False,
+        #             mirror=1
+        #         )
+        # """)
+        install_pyrosetta_file = Path(__file__).resolve().parent.parent / "uv" / "install_pyrosetta.py"
+        install_pyrosetta_script = install_pyrosetta_file.read_text()
         subprocess.run(
-            ["uv", "run", "--project", str(reproduce_env_dir), "--active", "python", "-c", install_script],
+            ["uv", "run", "--project", str(reproduce_env_dir), "--active", "python", "-c", install_pyrosetta_script],
             check=True,
         )
-        lock_file = os.path.join(reproduce_env_dir, "uv.lock")
-        if os.path.isfile(lock_file):
-            with open(lock_file, "r") as f:
-                print("Reproduced uv lock file:\n", f.read(), "\n------\n")
+        # lock_file = os.path.join(reproduce_env_dir, "uv.lock")
+        # if os.path.isfile(lock_file):
+        #     with open(lock_file, "r") as f:
+        #         print("Reproduced uv lock file:\n", f.read(), "\n------\n")
+
 
 if __name__ == "__main__":
     print("Running: {0}".format(__file__))

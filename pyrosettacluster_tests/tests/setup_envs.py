@@ -145,26 +145,28 @@ def setup_uv_environment(env_dir):
 
     # Run PyRosetta installer with mirror fallback
     print("Running PyRosetta installer in uv environment...")
-    install_script = textwrap.dedent("""
-        import pyrosetta_installer
-        try:
-            pyrosetta_installer.install_pyrosetta(
-                distributed=False,
-                serialization=True,
-                skip_if_installed=False,
-                mirror=0
-            )
-        except Exception as e:
-            print(f"PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
-            pyrosetta_installer.install_pyrosetta(
-                distributed=False,
-                serialization=True,
-                skip_if_installed=False,
-                mirror=1
-            )
-    """)
+    # install_script = textwrap.dedent("""
+    #     import pyrosetta_installer
+    #     try:
+    #         pyrosetta_installer.install_pyrosetta(
+    #             distributed=False,
+    #             serialization=True,
+    #             skip_if_installed=False,
+    #             mirror=0
+    #         )
+    #     except Exception as e:
+    #         print(f"PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
+    #         pyrosetta_installer.install_pyrosetta(
+    #             distributed=False,
+    #             serialization=True,
+    #             skip_if_installed=False,
+    #             mirror=1
+    #         )
+    # """)
+    install_pyrosetta_file = Path(__file__).resolve().parent.parent / "uv" / "install_pyrosetta.py"
+    install_pyrosetta_script = install_pyrosetta_file.read_text()
     subprocess.run(
-        ["uv", "run", "--project", str(env_path), "python", "-c", install_script],
+        ["uv", "run", "--project", str(env_path), "python", "-c", install_pyrosetta_script],
         check=True,
     )
 
