@@ -31,6 +31,58 @@ from pyrosetta.distributed.cluster.config import (
 )
 
 
+def get_env_export_cmd(env_manager: str) -> str:
+    """
+    Return the appropriate environment export command for the given environment manager.
+    Automatically adjusts for Pixi and uv when a project/manifest path is set via
+    environment variables or custom run paths.
+
+    Args:
+        env_manager: A `str` object of either "pixi", "uv", "mamba", "conda".
+
+    Returns:
+        A shell command string for subprocess execution.
+    """
+
+    # Default commands
+    base_cmds = {
+        "pixi": "pixi lock --check || pixi lock --no-install",
+        "uv": "uv export --format requirements-txt --frozen",
+        "mamba": f"mamba env export --prefix '{sys.prefix}'",
+        "conda": f"conda env export --prefix '{sys.prefix}'",
+    }
+
+    # Pixi
+    if env_manager == "pixi":
+        manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
+        if manifest_path:
+            # Append --manifest-path flag to both commands in the OR clause
+            return (
+                f"pixi lock --check --manifest-path '{manifest_path}' || "
+                f"pixi lock --no-install --manifest-path '{manifest_path}'"
+            )
+
+        return base_cmds["pixi"]
+
+    # Uv
+    elif env_manager == "uv":
+        project_dir = (
+            os.environ.get("UV_PROJECT")
+            or os.environ.get("UV_PROJECT_ENVIRONMENT")
+        )
+        if project_dir:
+            # Append --project flag
+            return (
+                f"uv export --format requirements-txt --frozen --project '{project_dir}'"
+            )
+
+        return base_cmds["uv"]
+
+    # Conda / Mamba
+    else:
+        return base_cmds.get(env_manager, "")
+
+
 @bind_method(pyrosetta.distributed.cluster.toolkit)
 @bind_method(pyrosetta.distributed.cluster.converters)
 @bind_method(pyrosetta.distributed.cluster.converter_tasks)
@@ -46,22 +98,26 @@ def get_yml() -> str:
             if not line.strip().startswith("#")
         )
 
-    _ENV_EXPORT_CMDS = {
-        # "pixi": "pixi lock --check || (echo 'Regenerating pixi.lock file...' && pixi lock --no-install); cat pixi.lock", # Updated
-        "uv": "uv export --format requirements-txt --frozen",
-        "mamba": f"mamba env export --prefix '{sys.prefix}'",
-        "conda": f"conda env export --prefix '{sys.prefix}'",
-    }
+    # _ENV_EXPORT_CMDS = {
+    #     "pixi": "pixi lock --check || pixi lock --no-install", # Updated
+    #     "uv": "uv export --format requirements-txt --frozen",
+    #     "mamba": f"mamba env export --prefix '{sys.prefix}'",
+    #     "conda": f"conda env export --prefix '{sys.prefix}'",
+    # }
     env_manager = get_environment_manager()
+    # environment_cmd = _ENV_EXPORT_CMDS[env_manager]
+    environment_cmd = get_env_export_cmd(env_manager)
+    print(f"Running environment command: `{environment_cmd}`")
     if env_manager == "pixi": # Updated
-        environment_cmd = "pixi lock --check || pixi lock --no-install"
-        print(f"Running environment command: `{environment_cmd}`")
-        subprocess.run(environment_cmd, shell=True, check=True)
+        subprocess.run(
+            environment_cmd,
+            shell=True,
+            check=True,
+            stderr=subprocess.DEVNULL,
+        )
         with open("pixi.lock") as f:
             yml = f.read()
     else:
-        environment_cmd = _ENV_EXPORT_CMDS[env_manager]
-        print(f"Running environment command: `{environment_cmd}`")
         try:
             raw_yml = subprocess.check_output(
                 environment_cmd,
@@ -94,11 +150,6 @@ def get_yml() -> str:
 
     if env_manager == "uv":
         yml = remove_comments(yml)
-
-    # print("Generated YML string:")
-    # print("#" * 100)
-    # print(yml)
-    # print("#" * 100)
 
     return yml
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
