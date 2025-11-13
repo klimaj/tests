@@ -35,6 +35,7 @@ from typing import (
 # from pyrosetta.distributed.cluster.tools import get_instance_kwargs
 
 # ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
 from pyrosettacluster_tests.utils import (
     ROSETTACOMMONS_CONDA_CHANNEL,
     detect_platform,

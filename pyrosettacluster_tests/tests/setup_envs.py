@@ -10,6 +10,7 @@ import textwrap
 
 from pathlib import Path
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
 from pyrosettacluster_tests.utils import (
     ROSETTACOMMONS_CONDA_CHANNEL,
     detect_platform,
