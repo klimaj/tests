@@ -54,6 +54,7 @@ def get_env_export_cmd(env_manager: str) -> str:
 
     # Pixi
     if env_manager == "pixi":
+        # https://pixi.sh/dev/reference/environment_variables/#environment-variables-set-by-pixi
         manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
         if manifest_path:
             # Append --manifest-path flag to both commands in the OR clause
@@ -193,6 +194,7 @@ def get_yml() -> str:
                 check=True,
                 stderr=subprocess.DEVNULL,
             )
+            # https://pixi.sh/dev/reference/environment_variables/#environment-variables-set-by-pixi
             manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
             lock_path = os.path.join(
                 os.path.dirname(manifest_path) if manifest_path else os.getcwd(),

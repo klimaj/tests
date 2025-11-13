@@ -43,21 +43,10 @@ jobs:
           export PATH="$HOME/.pixi/bin:$PATH"
           pixi --version
 
-      # - name: Set up Pixi global channels
-      #   run: |
-      #     mkdir -p $HOME/.pixi
-      #     cat >> $HOME/.pixi/config.toml <<EOF
-      #     [channels]
-      #     default = ["https://conda.rosettacommons.org", "conda-forge"]
-      #     EOF
-
       - name: Run tests (pixi)
         shell: bash
         run: |
           export PATH="$HOME/.pixi/bin:$PATH"
-          # Add Rosetta Commons conda channel for reproduce step
-          # pixi config append default-channels https://conda.rosettacommons.org --global
-          # pixi config list default-channels --global
           which python
           python --version
           python -u -m unittest pyrosettacluster_tests.tests.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_pixi -v
