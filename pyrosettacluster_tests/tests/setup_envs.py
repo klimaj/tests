@@ -131,13 +131,13 @@ def setup_uv_environment(env_dir):
     #     check=True,
     #     cwd=str(env_path),
     # )
-    requirements_txt_file = os.path.join(os.path.dirname(__file__), os.pardir, "uv", "requirements.txt")
+    requirements_txt_file = Path(__file__).resolve().parent.parent / "uv" / "requirements.txt"
     subprocess.run(
         [
             "uv",
             "add",
             "--project", str(env_path),
-            "--requirements", requirements_txt_file,
+            "--requirements", str(requirements_txt_file),
         ],
         check=True,
         cwd=str(env_path),
