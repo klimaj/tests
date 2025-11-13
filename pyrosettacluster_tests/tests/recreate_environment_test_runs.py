@@ -272,8 +272,6 @@ def my_protocol(packed_pose, **kwargs):
 
     pack_rotamers.apply(pose)
     min_mover.apply(pose)
-    pack_rotamers.apply(pose)
-    min_mover.apply(pose)
     scorefxn(pose)
 
     return pose
