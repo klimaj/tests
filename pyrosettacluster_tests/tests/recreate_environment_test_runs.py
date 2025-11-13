@@ -193,8 +193,9 @@ def get_yml() -> str:
                 check=True,
                 stderr=subprocess.DEVNULL,
             )
+            manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
             lock_path = os.path.join(
-                os.environ.get("PIXI_PROJECT_MANIFEST", os.getcwd()),
+                os.path.dirname(manifest_path) if manifest_path else os.getcwd(),
                 "pixi.lock",
             )
             with open(lock_path, encoding="utf-8") as f:
