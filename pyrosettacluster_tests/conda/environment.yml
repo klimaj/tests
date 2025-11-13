@@ -1,0 +1,10 @@
+name: {name}
+channels:
+  - {rosettacommons_conda_channel}
+  - conda-forge
+dependencies:
+  - python={py_version}.*
+  - pyrosetta
+  - pip
+  - pip:
+    - pyrosetta-distributed

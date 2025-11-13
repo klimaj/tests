@@ -196,18 +196,24 @@ def setup_conda_environment(env_dir, env_manager="conda"):
 
     # Build the conda environment file dynamically
     name = os.path.basename(env_dir)
-    env_yaml = textwrap.dedent(f"""
-    name: {name}
-    channels:
-      - {ROSETTACOMMONS_CONDA_CHANNEL}
-      - conda-forge
-    dependencies:
-      - python={py_version}.*
-      - pyrosetta
-      - pip
-      - pip:
-        - pyrosetta-distributed
-    """)
+    # env_yaml = textwrap.dedent(f"""
+    # name: {name}
+    # channels:
+    #   - {ROSETTACOMMONS_CONDA_CHANNEL}
+    #   - conda-forge
+    # dependencies:
+    #   - python={py_version}.*
+    #   - pyrosetta
+    #   - pip
+    #   - pip:
+    #     - pyrosetta-distributed
+    # """)
+    env_yaml_file = Path(__file__).resolve().parent.parent / "conda" / "environment.yml"
+    env_yaml = env_yaml_file.read_text().format(
+        name=name,
+        rosettacommons_conda_channel=ROSETTACOMMONS_CONDA_CHANNEL,
+        py_version=py_version,
+    )
 
     # Create environment directory
     env_path = Path(env_dir)
