@@ -6,11 +6,10 @@ import os
 import subprocess
 import sys
 import tempfile
-import textwrap
 
 from pathlib import Path
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 from pyrosettacluster_tests.utils import (
     ROSETTACOMMONS_CONDA_CHANNEL,
     detect_platform,

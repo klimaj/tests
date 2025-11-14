@@ -1,22 +1,13 @@
 __author__ = "Jason C. Klima"
 
-import os
-import sys
-
-# print("### Debug")
-# print("PYTHONPATH:", os.environ.get("PYTHONPATH"))
-# print("sys.executable:", sys.executable)
-# print("sys.path:")
-# for p in sys.path:
-#     print(" ", p)
-# print("CWD:", os.getcwd())
-# print("### Debug")
 
 import argparse
 import os
+import sys
 import tempfile
 
 from pyrosetta.distributed.cluster import reproduce, run
+
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 import pyrosetta
@@ -26,10 +17,9 @@ import sys
 from pyrosetta.bindings.utility import bind_method
 from pyrosetta.distributed.cluster.config import (
     get_environment_manager,
-    # get_environment_var,
-    # source_domains,
+    get_environment_var,
+    source_domains,
 )
-
 
 def get_env_export_cmd(env_manager: str) -> str:
     """
@@ -83,78 +73,6 @@ def get_env_export_cmd(env_manager: str) -> str:
     else:
         return base_cmds.get(env_manager, "")
 
-
-# @bind_method(pyrosetta.distributed.cluster.toolkit)
-# @bind_method(pyrosetta.distributed.cluster.converters)
-# @bind_method(pyrosetta.distributed.cluster.converter_tasks)
-# def get_yml() -> str:
-#     """
-#     Run environment export command to return a YML file string with the current virtual
-#     environment, excluding certain source domains.
-#     """
-#     def remove_comments(text: str) -> str:
-#         """Remove lines starting with '#' from a requirements.txt file string."""
-#         return "\n".join(
-#             line for line in text.splitlines()
-#             if not line.strip().startswith("#")
-#         )
-
-#     # _ENV_EXPORT_CMDS = {
-#     #     "pixi": "pixi lock --check || pixi lock --no-install", # Updated
-#     #     "uv": "uv export --format requirements-txt --frozen",
-#     #     "mamba": f"mamba env export --prefix '{sys.prefix}'",
-#     #     "conda": f"conda env export --prefix '{sys.prefix}'",
-#     # }
-#     env_manager = get_environment_manager()
-#     # environment_cmd = _ENV_EXPORT_CMDS[env_manager]
-#     environment_cmd = get_env_export_cmd(env_manager)
-#     print(f"Running environment command: `{environment_cmd}`")
-#     if env_manager == "pixi": # Updated
-#         subprocess.run(
-#             environment_cmd,
-#             shell=True,
-#             check=True,
-#             stderr=subprocess.DEVNULL,
-#         )
-#         with open("pixi.lock") as f:
-#             yml = f.read()
-#     else:
-#         try:
-#             raw_yml = subprocess.check_output(
-#                 environment_cmd,
-#                 shell=True,
-#                 stderr=subprocess.DEVNULL,
-#             ).decode()
-#         except subprocess.CalledProcessError:
-#             raw_yml = ""
-
-#         yml = (
-#             (
-#                 os.linesep.join(
-#                     # [f"# {get_environment_var()}={get_environment_manager()}"]
-#                     # + [ # Updated
-#                     [
-#                         line
-#                         for line in raw_yml.split(os.linesep)
-#                         if all(
-#                             source_domain not in line for source_domain in source_domains
-#                         )
-#                         and all(not line.startswith(s) for s in ["name:", "prefix:"])
-#                         and line
-#                     ]
-#                 )
-#                 + os.linesep
-#             )
-#             if raw_yml
-#             else raw_yml
-#         )
-
-#     if env_manager == "uv":
-#         yml = remove_comments(yml)
-
-#     return yml
-
-
 @bind_method(pyrosetta.distributed.cluster.toolkit)
 @bind_method(pyrosetta.distributed.cluster.converters)
 @bind_method(pyrosetta.distributed.cluster.converter_tasks)
@@ -178,7 +96,6 @@ def get_yml() -> str:
             if not line.startswith(("name:", "prefix:")) and line.strip()
         ]
         return "\n".join(filtered_lines) + "\n"
-
 
     env_manager = get_environment_manager()
     environment_cmd = get_env_export_cmd(env_manager)
@@ -228,8 +145,8 @@ def get_yml() -> str:
         return remove_metadata(raw_yml)
 
     raise NotImplementedError(env_manager)
-
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
 def create_tasks():
     yield {
@@ -237,7 +154,7 @@ def create_tasks():
         "extra_options": "-out:level 300 -multithreading:total_threads 1 -ignore_unrecognized_res 1 -load_PDB_components 0",
         "set_logging_handler": "logging",
         "silent": False,
-        "seq": "NEW/ENV",
+        "seq": "CREATE/A/NEW/ENV",
     }
 
 
@@ -367,12 +284,6 @@ def run_reproduce_simulation(
 ):
     # Set environment manager
     os.environ["PYROSETTACLUSTER_ENVIRONMENT_MANAGER"] = env_manager
-
-    # print("*" * 50)
-    # print("Reproduced environment environment file:")
-    # print(get_yml())
-    # print("*" * 50)
-
     with tempfile.TemporaryDirectory() as tmp_dir:
         # Setup simulation
         scratch_dir = os.path.join(tmp_dir, "scratch")

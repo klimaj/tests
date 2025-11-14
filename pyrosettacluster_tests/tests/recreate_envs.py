@@ -4,7 +4,6 @@ __author__ = "Jason C. Klima"
 import argparse
 import os
 import subprocess
-import textwrap
 
 from pathlib import Path
 
@@ -36,8 +35,7 @@ from typing import (
 
 # from pyrosetta.distributed.cluster.tools import get_instance_kwargs
 
-# ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org"
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 from pyrosettacluster_tests.utils import (
     ROSETTACOMMONS_CONDA_CHANNEL,
     detect_platform,
@@ -141,7 +139,6 @@ class EnvironmentConfig(Generic[G]):
 
             elif self.environment_manager == "mamba":
                 return f"mamba env create -f '{yml_file}' -p '{project_dir}'"
-            # Updated
 
         elif self.environment_manager == "uv":
             # Write the requirements.txt file
@@ -152,73 +149,15 @@ class EnvironmentConfig(Generic[G]):
             py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
             return (
                 f"uv init '{project_dir}' --python {py_version} && "
-                # f"uv add --project '{project_dir}' pip && "
-                # f"uv pip sync '{req_file}' --project '{project_dir}'"
                 f"uv add --requirements '{req_file}' --project '{project_dir}'"
-            ) # Updated
+            )
 
-        elif self.environment_manager == "pixi": # Updated
-            # subprocess.run(f"pixi init '{project_dir}'", shell=True, stderr=subprocess.STDOUT)
-            # toml_file = os.path.join(project_dir, "pixi.toml")
-            # if not os.path.isfile(toml_file):
-            #     print("Pixi init did not write pixi.toml. Writing now...")
-            #     tmol_data = textwrap.dedent("""name = "test-project"
-            #         version = "0.1.0"
-            #         channels = ["conda-forge"]
-            #         platforms = ["linux-64"]
-            #     """)
-            #     with open(toml_file, "w") as f:
-            #         f.write(tmol_data)
-                # Detect Python version
-
-            # def detect_platform():
-            #     """Detect system platform string used by GitHub Actions."""
-            #     import platform
-
-            #     system = platform.system().lower()
-            #     machine = platform.machine().lower()
-
-            #     if system == "linux":
-            #         plat = "linux-64" if "64" in machine else "linux-32"
-            #     elif system == "darwin":
-            #         plat = "osx-arm64" if "arm" in machine else "osx-64"
-            #     elif system == "windows":
-            #         plat = "win-64"
-            #     else:
-            #         raise RuntimeError(f"Unsupported platform: {system} ({machine})")
-
-            #     return plat
-
+        elif self.environment_manager == "pixi":
             py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
             py_feature = f"py{sys.version_info.major}{sys.version_info.minor}"
 
             # Detect platform
             plat = detect_platform()
-
-            # Build 'pixi.toml' file dynamically
-            # pixi_toml = textwrap.dedent(f"""
-            # [workspace]
-            # channels = ["{ROSETTACOMMONS_CONDA_CHANNEL}", "conda-forge"]
-            # name = "{environment_name}"
-            # platforms = ["{plat}"]
-            # version = "1.0.0"
-
-            # [dependencies]
-            # pyrosetta = "*"
-
-            # [pypi-dependencies]
-            # pyrosetta-distributed = "*"
-
-            # [feature.{py_feature}.dependencies]
-            # python = "{py_version}.*"
-
-            # [environments]
-            # {py_feature} = ["{py_feature}"]
-            # """)
-            # toml_file = os.path.join(project_dir, "pixi.toml")
-            # with open(toml_file, "w") as f:
-            #     f.write(pixi_toml)
-
             template_toml_file = os.path.join(os.path.dirname(__file__), os.pardir, "pixi", "pixi.toml")
             with open(template_toml_file, "r") as f:
                 pixi_toml = f.read().format(
@@ -234,8 +173,7 @@ class EnvironmentConfig(Generic[G]):
             lock_file = os.path.join(project_dir, "pixi.lock")
             with open(lock_file, "w") as f:
                 f.write(raw_spec)
-            # return f"pixi init '{project_dir}' && pixi install --locked --manifest-path '{project_dir}'" # Updated
-            # return f"PIXI_FROZEN=true pixi install --frozen --manifest-path '{project_dir}'" # Updated
+
             return "pixi install --frozen"
 
         raise RuntimeError(f"Unsupported environment manager: '{self.environment_manager}'")
@@ -427,31 +365,14 @@ def recreate_environment(
     # Recreate the environment
     with tempfile.TemporaryDirectory() as tmp_dir:
         env_create_cmd = _env_config.env_create_cmd(environment_name, raw_spec, tmp_dir, base_dir)
-        env_dir = os.path.join(base_dir, environment_name) # Updated
-        # if environment_manager == "pixi":
-        #     # lock_file = os.path.join(env_dir, "pixi.lock")
-        #     # with open(lock_file, "r") as f:
-        #     #     print("Written pixi.lock file:\n", f.read(), "\n------\n")
-        #     # toml_file = os.path.join(env_dir, "pixi.toml")
-        #     # with open(toml_file, "r") as f:
-        #     #     print("Written pixi.toml file:\n", f.read(), "\n------\n")
-        #     # print(f"Running environment create command: `{env_create_cmd}`")
-        #     env = os.environ.copy()
-        #     env["PIXI_FROZEN"] = "true"
-        #     output = _run_subprocess(env_create_cmd, cwd=env_dir, env=env) # Updated
-        # else:
-        #     print(f"Running environment create command: `{env_create_cmd}`")
-        #     output = _run_subprocess(env_create_cmd, cwd=env_dir, env=None) # Updated
-
+        env_dir = os.path.join(base_dir, environment_name)
         print(f"Running environment create command: `{env_create_cmd}`")
-        output = _run_subprocess(env_create_cmd, cwd=env_dir, env=None) # Updated
-
+        output = _run_subprocess(env_create_cmd, cwd=env_dir, env=None)
         print(
             f"\nEnvironment successfully created using {environment_manager}: '{environment_name}'\nOutput:\n{output}\n",
             flush=True,
         )
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 
 
 def run_recreate_environment(
@@ -488,35 +409,12 @@ def run_recreate_environment(
         # Therefore, installing the correct PyRosetta version in the recreated uv environment depends fortuitously on a prompt
         # uv environment recreation after the original uv environment creation.
         print("Running PyRosetta installer in recreated uv environment...")
-        # Run PyRosetta installer with mirror fallback
-        # install_script = textwrap.dedent("""
-        #     import pyrosetta_installer
-        #     try:
-        #         pyrosetta_installer.install_pyrosetta(
-        #             distributed=False,
-        #             serialization=True,
-        #             skip_if_installed=False,
-        #             mirror=0
-        #         )
-        #     except Exception as e:
-        #         print(f"Recreated PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
-        #         pyrosetta_installer.install_pyrosetta(
-        #             distributed=False,
-        #             serialization=True,
-        #             skip_if_installed=False,
-        #             mirror=1
-        #         )
-        # """)
         install_pyrosetta_file = Path(__file__).resolve().parent.parent / "uv" / "install_pyrosetta.py"
         install_pyrosetta_script = install_pyrosetta_file.read_text()
         subprocess.run(
             ["uv", "run", "--project", str(reproduce_env_dir), "python", "-c", install_pyrosetta_script],
             check=True,
         )
-        # lock_file = os.path.join(reproduce_env_dir, "uv.lock")
-        # if os.path.isfile(lock_file):
-        #     with open(lock_file, "r") as f:
-        #         print("Reproduced uv lock file:\n", f.read(), "\n------\n")
 
 
 if __name__ == "__main__":
