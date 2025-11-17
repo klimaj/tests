@@ -148,7 +148,7 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         # Recreate environment
         reproduce_env_name = f"{original_env_name}_reproduce"
         reproduce_env_dir = os.path.join(self.workdir.name, reproduce_env_name)
-        recreate_env_script = os.path.join(os.path.dirname(__file__), "recreate_envs.py")
+        recreate_env_script = os.path.join(os.path.dirname(__file__), "run_recreate_envs.py")
         cmd = (
             f"{sys.executable} -u {recreate_env_script} "
             f"--env_manager '{environment_manager}' "

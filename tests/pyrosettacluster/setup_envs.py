@@ -33,27 +33,6 @@ def setup_pixi_environment(env_dir):
     # Detect platform
     plat = detect_platform()
 
-    # Build 'pixi.toml' file dynamically
-    # pixi_toml = textwrap.dedent(f"""
-    # [workspace]
-    # channels = ["{ROSETTACOMMONS_CONDA_CHANNEL}", "conda-forge"]
-    # name = "pyrosetta-pixi"
-    # platforms = ["{plat}"]
-    # version = "1.0.0"
-
-    # [dependencies]
-    # pyrosetta = "*"
-
-    # [pypi-dependencies]
-    # pyrosetta-distributed = "*"
-
-    # [feature.{py_feature}.dependencies]
-    # python = "{py_version}.*"
-
-    # [environments]
-    # {py_feature} = ["{py_feature}"]
-    # """)
-
     template_toml_file = os.path.join(os.path.dirname(__file__), os.pardir, "pixi", "pixi.toml")
     with open(template_toml_file, "r") as f:
         pixi_toml = f.read().format(
@@ -103,33 +82,6 @@ def setup_uv_environment(env_dir):
 
     # Install pyrosetta-installer
     print("Adding 'pyrosetta-installer', 'pip', and `pyrosetta.distributed` depedencies to uv environment...")
-    # subprocess.run(
-    #     [
-    #         "uv",
-    #         "add",
-    #         "--project", str(env_path),
-    #         "pyrosetta-installer>=0.1.2",
-    #         "pip>=25.3",
-    #         "attrs>=19.3.0",
-    #         "billiard>=3.6.3.0",
-    #         "blosc>=1.8.3",
-    #         "cloudpickle>=1.5.0",
-    #         "cryptography>=2.8",
-    #         "dask>=2.16.0",
-    #         "dask-jobqueue>=0.7.0",
-    #         "distributed>=2.16.0",
-    #         "gitpython>=3.1.1",
-    #         "jupyter>=1.0.0",
-    #         "numpy>=1.17.3",
-    #         "pandas>=0.25.2",
-    #         "py3Dmol>=0.8.0",
-    #         "python-xz>=0.4.0",
-    #         "scipy>=1.4.1",
-    #         "traitlets>=4.3.3",
-    #     ],
-    #     check=True,
-    #     cwd=str(env_path),
-    # )
     requirements_txt_file = Path(__file__).resolve().parent.parent / "uv" / "requirements.txt"
     subprocess.run(
         [
@@ -144,24 +96,6 @@ def setup_uv_environment(env_dir):
 
     # Run PyRosetta installer with mirror fallback
     print("Running PyRosetta installer in uv environment...")
-    # install_script = textwrap.dedent("""
-    #     import pyrosetta_installer
-    #     try:
-    #         pyrosetta_installer.install_pyrosetta(
-    #             distributed=False,
-    #             serialization=True,
-    #             skip_if_installed=False,
-    #             mirror=0
-    #         )
-    #     except Exception as e:
-    #         print(f"PyRosetta installation with 'mirror=0' failed: {e}. Retrying with 'mirror=1'.")
-    #         pyrosetta_installer.install_pyrosetta(
-    #             distributed=False,
-    #             serialization=True,
-    #             skip_if_installed=False,
-    #             mirror=1
-    #         )
-    # """)
     install_pyrosetta_file = Path(__file__).resolve().parent.parent / "uv" / "install_pyrosetta.py"
     install_pyrosetta_script = install_pyrosetta_file.read_text()
     subprocess.run(
@@ -195,18 +129,6 @@ def setup_conda_environment(env_dir, env_manager="conda"):
 
     # Build the conda environment file dynamically
     name = os.path.basename(env_dir)
-    # env_yaml = textwrap.dedent(f"""
-    # name: {name}
-    # channels:
-    #   - {ROSETTACOMMONS_CONDA_CHANNEL}
-    #   - conda-forge
-    # dependencies:
-    #   - python={py_version}.*
-    #   - pyrosetta
-    #   - pip
-    #   - pip:
-    #     - pyrosetta-distributed
-    # """)
     env_yaml_file = Path(__file__).resolve().parent.parent / "conda" / "environment.yml"
     env_yaml = env_yaml_file.read_text().format(
         name=name,
