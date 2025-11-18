@@ -450,32 +450,27 @@ def recreate_environment(env_dir: str, env_manager: str, timeout: float):
                 "Please ensure that the mamba environment 'environment.yml' file is in the environment directory."
             )
         # Transactional Mamba logic
-        temp_dir = tempfile.mkdtemp(prefix="env_backup_")
-        try:
+        with tempfile.TemporaryDirectory(prefix="env_backup_") as temp_dir:
             # Move all files in `env_dir` into `temp_dir`
             for f in os.listdir(env_dir):
                 shutil.move(os.path.join(env_dir, f), temp_dir)
             temp_yml = os.path.join(temp_dir, "environment.yml")
             env_create_cmd = f"mamba env create -f '{temp_yml}' -p '{env_dir}'"
-            # Run Mamba
-            run_subprocess(env_create_cmd, cwd=env_dir, timeout=timeout)
-        except Exception:
-            # On failure, restore all original files
-            for f in os.listdir(temp_dir):
-                shutil.move(os.path.join(temp_dir, f), env_dir)
-            raise
-        else:
-            # On success, restore any remaining original files that don't conflict
-            for f in os.listdir(temp_dir):
-                target = os.path.join(env_dir, f)
-                if not os.path.exists(target):
+            try:
+                run_subprocess(env_create_cmd, cwd=env_dir, timeout=timeout)
+            except Exception:
+                # On failure, restore all original files from `temp_dir`
+                for f in os.listdir(temp_dir):
                     shutil.move(os.path.join(temp_dir, f), env_dir)
-                else:
-                    print(f"[WARNING] Existing file is being overwritten in the created environment directory: '{target}'")
-        finally:
-            # Clean up temporary directory
-            if os.path.exists(temp_dir):
-                shutil.rmtree(temp_dir)
+                raise
+            else:
+                # On success, restore original files that don't conflict
+                for f in os.listdir(temp_dir):
+                    target = os.path.join(env_dir, f)
+                    if not os.path.exists(target):
+                        shutil.move(os.path.join(temp_dir, f), env_dir)
+                    else:
+                        print(f"[WARNING] Existing file is being overwritten in the created environment directory: '{target}'")
 
     else:
         raise ValueError(f"Unsupported environment manager: {env_manager}")
