@@ -101,7 +101,7 @@ def setup_uv_environment(env_dir):
 
     # Install pyrosetta-installer
     print("Adding 'pyrosetta-installer', 'pip', and `pyrosetta.distributed` depedencies to uv environment...")
-    requirements_txt_file = Path(__file__).resolve().parent.parent / "uv" / "requirements.txt"
+    requirements_txt_file = Path(__file__).resolve().parent / "uv" / "requirements.txt"
     subprocess.run(
         [
             "uv",
@@ -115,7 +115,7 @@ def setup_uv_environment(env_dir):
 
     # Run PyRosetta installer with mirror fallback
     print("Running PyRosetta installer in uv environment...")
-    install_pyrosetta_file = Path(__file__).resolve().parent.parent / "uv" / "install_pyrosetta.py"
+    install_pyrosetta_file = Path(__file__).resolve().parent / "uv" / "install_pyrosetta.py"
     install_pyrosetta_script = install_pyrosetta_file.read_text()
     subprocess.run(
         ["uv", "run", "--project", str(env_path), "python", "-c", install_pyrosetta_script],
