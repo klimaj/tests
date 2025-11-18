@@ -365,6 +365,7 @@ import shutil
 import subprocess
 import tempfile
 
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 
@@ -478,6 +479,20 @@ def recreate_environment(env_dir: str, env_manager: str, timeout: float):
     # For all managers except mamba
     if env_manager != "mamba":
         run_subprocess(env_create_cmd, cwd=env_dir, timeout=timeout)
+    
+    if env_manager == "uv":
+        # Run PyRosetta installer with mirror fallback
+        print("[INFO] Running PyRosetta installer in uv environment...")
+        install_pyrosetta_file = Path(__file__).resolve().parent / "install_pyrosetta.py"
+        # install_pyrosetta_script = install_pyrosetta_file.read_text()
+        # subprocess.run(
+        #     ["uv", "run", "--project", f"'{env_dir}'", "python", "-c", install_pyrosetta_script],
+        #     check=True,
+        # )
+        subprocess.run(
+            ["uv", "run", "--project", f"'{env_dir}'", "python", install_pyrosetta_file],
+            check=True,
+        )
 
     print(
         f"[INFO] Environment successfully created using {env_manager} in directory: '{env_dir}'",
