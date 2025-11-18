@@ -15,6 +15,8 @@ import tempfile
 import unittest
 import uuid
 
+from pathlib import Path
+
 
 class TestEnvironmentReproducibility(unittest.TestCase):
     @classmethod
@@ -70,7 +72,7 @@ class TestEnvironmentReproducibility(unittest.TestCase):
 
         return returncode
 
-    def recreate_environment_test(self, environment_manager="conda", verbose=False):
+    def recreate_environment_test(self, environment_manager="conda", verbose=True):
         """Test for PyRosettaCluster decoy reproducibility in a recreated virtual environment."""
         self.assertIn(environment_manager, ("conda", "mamba", "uv", "pixi"))
 
@@ -148,30 +150,43 @@ class TestEnvironmentReproducibility(unittest.TestCase):
         # Recreate environment
         reproduce_env_name = f"{original_env_name}_reproduce"
         reproduce_env_dir = os.path.join(self.workdir.name, reproduce_env_name)
-        recreate_env_script = os.path.join(os.path.dirname(__file__), "run_recreate_envs.py")
+        dump_env_file_script = Path(__file__).resolve().parent.parent.parent / "pyrosettacluster" / "dump_env_file.py"
         cmd = (
-            f"{sys.executable} -u {recreate_env_script} "
-            f"--env_manager '{environment_manager}' "
-            f"--reproduce_env_dir '{reproduce_env_dir}' "
-            f"--original_scorefile_path '{original_scorefile_path}' "
-            f"--original_decoy_name {original_decoy_name}"
+            f"{sys.executable} -u {dump_env_file_script} "
+            f"--scorefile '{original_scorefile_path}' "
+            f"--decoy_name '{original_decoy_name}' "
+            f"--env_dir '{reproduce_env_dir}' "
+            f"--env_manager '{environment_manager}'"
         )
         returncode = TestEnvironmentReproducibility.run_subprocess(
             cmd,
             module_dir=None,
-            cwd=original_env_dir,
+            cwd=None,
         )
         self.assertEqual(returncode, 0, msg=f"Subprocess command failed: {cmd}")
         self.assertTrue(
             os.path.isdir(reproduce_env_dir),
             f"Reproduced '{environment_manager}' environment directory was not created: '{reproduce_env_dir}'",
         )
+        recreate_env_script = Path(__file__).resolve().parent.parent.parent / "pyrosettacluster" / "recreate_env.py"
+        timeout = 999
+        cmd = (
+            f"{sys.executable} -u {recreate_env_script} "
+            f"--env_dir '{reproduce_env_dir}' "
+            f"--env_manager '{environment_manager}' "
+            f"--timeout '{timeout}' "
+        )
+        returncode = TestEnvironmentReproducibility.run_subprocess(
+            cmd,
+            module_dir=None,
+            cwd=None,
+        )
+        self.assertEqual(returncode, 0, msg=f"Subprocess command failed: {cmd}")
 
         # Run reproduction simulation inside recreated environment
         reproduce_output_path = os.path.join(reproduce_env_dir, f"{environment_manager}_reproduce_outputs")
         reproduce_scorefile_name = "test_scores.json"
         module = os.path.splitext(os.path.basename(test_script))[0]
-
         if environment_manager == "pixi":
             cmd = (
                 f"pixi run python -u -m {module} "

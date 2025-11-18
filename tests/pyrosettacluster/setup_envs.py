@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-from pyrosettacluster_tests.utils import (
+from tests.pyrosettacluster.utils import (
     ROSETTACOMMONS_CONDA_CHANNEL,
     detect_platform,
 )
@@ -71,14 +71,25 @@ def setup_uv_environment(env_dir):
         raise FileExistsError(f"The specified uv environment path already exists: '{env_path}'.")
 
     # Detect Python version
-    py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    # py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
     # Create uv environment using the current Python
     print(f"Creating uv environment at '{env_path}'...")
-    subprocess.run(
-        ["uv", "init", str(env_path), "--python", py_version],
-        check=True,
-    )
+    # subprocess.run(
+    #     ["uv", "init", str(env_path), "--python", py_version],
+    #     check=True,
+    # )
+    os.makedirs(env_dir, exist_ok=True)
+    py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    template_toml_file = Path(__file__).resolve().parent / "uv" / "pyproject.toml"
+    with open(template_toml_file, "r") as f:
+        toml_data = f.read().format(
+            name=os.path.basename(env_dir),
+            py_version=py_version,
+        )
+    toml_file = env_path / "pyproject.toml"
+    with open(toml_file, "w") as f:
+        f.write(toml_data)
 
     # Install pyrosetta-installer
     print("Adding 'pyrosetta-installer', 'pip', and `pyrosetta.distributed` depedencies to uv environment...")
@@ -129,7 +140,7 @@ def setup_conda_environment(env_dir, env_manager="conda"):
 
     # Build the conda environment file dynamically
     name = os.path.basename(env_dir)
-    env_yaml_file = Path(__file__).resolve().parent.parent / "conda" / "environment.yml"
+    env_yaml_file = Path(__file__).resolve().parent / "conda" / "environment.yml"
     env_yaml = env_yaml_file.read_text().format(
         name=name,
         rosettacommons_conda_channel=ROSETTACOMMONS_CONDA_CHANNEL,
