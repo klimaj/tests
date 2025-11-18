@@ -33,7 +33,11 @@ def setup_pixi_environment(env_dir):
     # Detect platform
     plat = detect_platform()
 
-    template_toml_file = os.path.join(os.path.dirname(__file__), os.pardir, "pixi", "pixi.toml")
+    print("Cwd:", os.getcwd())
+    print("Current file:", str(Path(__file__).resolve()))
+    print("sys.path:", sys.path)
+
+    template_toml_file = Path(__file__).resolve().parent / "pixi" / "pixi.toml"
     with open(template_toml_file, "r") as f:
         pixi_toml = f.read().format(
             rosettacommons_conda_channel=ROSETTACOMMONS_CONDA_CHANNEL,
@@ -72,6 +76,10 @@ def setup_uv_environment(env_dir):
 
     # Detect Python version
     # py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+
+    print("Cwd:", os.getcwd())
+    print("Current file:", str(Path(__file__).resolve()))
+    print("sys.path:", sys.path)
 
     # Create uv environment using the current Python
     print(f"Creating uv environment at '{env_path}'...")
