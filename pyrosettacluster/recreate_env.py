@@ -433,8 +433,8 @@ def recreate_environment(env_dir: str, env_manager: str, timeout: float):
             )
 
         # Install packages strictly from requirements.txt
-        # env_create_cmd = f"uv venv --seed && uv pip install -r '{req_file}'"
-        env_create_cmd = f"uv add --project '{env_dir}' --requirements '{req_file}'"
+        env_create_cmd = f"uv venv --seed && uv pip install -r '{req_file}'"
+        # env_create_cmd = f"uv add --project '{env_dir}' --requirements '{req_file}'"
 
     elif env_manager == "conda":
         yml_file = os.path.join(env_dir, "environment.yml")
