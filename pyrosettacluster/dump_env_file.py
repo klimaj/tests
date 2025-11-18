@@ -274,30 +274,41 @@ def main(
     if env_manager == "pixi":
         if not toml:
             # Detect Python version
-            py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
-            py_feature = f"py{sys.version_info.major}{sys.version_info.minor}"
-            # Detect platform
-            plat = detect_platform()
+            # py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+            # py_feature = f"py{sys.version_info.major}{sys.version_info.minor}"
+            # # Detect platform
+            # plat = detect_platform()
+            # toml_format = "pixi.toml"
+            # template_toml_file = Path(__file__).resolve().parent.parent / "actions" / "pyrosettacluster" / "pixi" / toml_format
+            # with open(template_toml_file, "r") as f:
+            #     toml = f.read().format(
+            #         rosettacommons_conda_channel=ROSETTACOMMONS_CONDA_CHANNEL,
+            #         name=os.path.basename(env_dir),
+            #         plat=plat,
+            #         py_version=py_version,
+            #         py_feature=py_feature,
+            #     )
+            original_env_dir = os.path.join(os.path.dirname(env_dir), os.path.basename(env_dir).split("_reproduce")[0])
             toml_format = "pixi.toml"
-            template_toml_file = Path(__file__).resolve().parent.parent / "actions" / "pyrosettacluster" / "pixi" / toml_format
-            with open(template_toml_file, "r") as f:
-                toml = f.read().format(
-                    rosettacommons_conda_channel=ROSETTACOMMONS_CONDA_CHANNEL,
-                    name=os.path.basename(env_dir),
-                    plat=plat,
-                    py_version=py_version,
-                    py_feature=py_feature,
-                )
+            original_toml_file = os.path.join(original_env_dir, toml_format)
+            with open(original_toml_file, "r") as f:
+                toml = f.read()
+
     elif env_manager == "uv":
         if not toml:
-            py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+            # py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+            # toml_format = "pyproject.toml"
+            # template_toml_file = Path(__file__).resolve().parent.parent / "actions" / "pyrosettacluster" / "uv" / toml_format
+            # with open(template_toml_file, "r") as f:
+            #     toml = f.read().format(
+            #         name=os.path.basename(env_dir),
+            #         py_version=py_version,
+            #     )
+            original_env_dir = os.path.join(os.path.dirname(env_dir), os.path.basename(env_dir).split("_reproduce")[0])
             toml_format = "pyproject.toml"
-            template_toml_file = Path(__file__).resolve().parent.parent / "actions" / "pyrosettacluster" / "uv" / toml_format
-            with open(template_toml_file, "r") as f:
-                toml = f.read().format(
-                    name=os.path.basename(env_dir),
-                    py_version=py_version,
-                )
+            original_toml_file = os.path.join(original_env_dir, toml_format)
+            with open(original_toml_file, "r") as f:
+                toml = f.read()
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     # Determine output files based on manager
