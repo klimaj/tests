@@ -14,12 +14,14 @@ from typing import Optional
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Temporary bootstrap - delete after PR #567 is merged
+import json
 import warnings
 
 from functools import singledispatch
 from pyrosetta import Pose
 from pyrosetta.distributed.packed_pose.core import PackedPose
 from pyrosetta.distributed.cluster import get_scores_dict
+from pyrosetta.distributed.cluster.io import secure_read_pickle
 from pyrosetta.distributed.cluster.exceptions import InputFileError
 
 from typing import Any, Dict, NoReturn, Optional, Tuple, Union
