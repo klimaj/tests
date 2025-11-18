@@ -165,7 +165,10 @@ jobs:
           mamba --version
 
       - name: Add repo root to PYTHONPATH
-        run: echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}" >> $GITHUB_ENV
+        run: |
+          export PATH="/usr/share/miniconda/bin:$PATH"
+          export CONDA_PKGS_DIRS="$HOME/.conda/pkgs"
+          echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}" >> $GITHUB_ENV
 
       - name: Run tests (mamba)
         shell: bash -l {0}
