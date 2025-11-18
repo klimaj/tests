@@ -27,6 +27,8 @@ jobs:
         # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: repo
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -49,7 +51,7 @@ jobs:
           export PATH="$HOME/.pixi/bin:$PATH"
           which python
           python --version
-          python -u -m unittest actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_pixi -v
+          python -u -m unittest repo.actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_pixi -v
 
 
   # ============================================================
@@ -64,6 +66,8 @@ jobs:
         # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: repo
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -81,7 +85,7 @@ jobs:
         run: |
           which python
           python --version
-          python -u -m unittest actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_uv -v
+          python -u -m unittest repo.actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_uv -v
 
 
   # ============================================================
@@ -96,6 +100,8 @@ jobs:
         # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: repo
 
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v3
@@ -111,7 +117,7 @@ jobs:
         run: |
           which python
           python --version
-          python -u -m unittest actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_conda -v
+          python -u -m unittest repo.actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_conda -v
 
 
   # ============================================================
@@ -126,6 +132,8 @@ jobs:
         # TODO: [3.10, 3.11, 3.12, 3.13, 3.14]
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: repo
 
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v3
@@ -162,4 +170,4 @@ jobs:
           export CONDA_PKGS_DIRS="$HOME/.conda/pkgs"
           which python
           python --version
-          python -u -m unittest actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_mamba -v
+          python -u -m unittest repo.actions.pyrosettacluster.test_env_reproducibility.TestEnvironmentReproducibility.test_recreate_environment_mamba -v
