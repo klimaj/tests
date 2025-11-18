@@ -433,7 +433,7 @@ def recreate_environment(env_dir: str, env_manager: str, timeout: float):
             )
 
         # Install packages strictly from requirements.txt
-        env_create_cmd = f"uv venv && uv pip sync --project '{env_dir}' '{req_file}'"
+        env_create_cmd = f"uv venv --project '{env_dir}' && uv pip sync --project '{env_dir}' '{req_file}'"
         # env_create_cmd = f"uv venv --seed && uv pip sync '{req_file}'" # Works with original pyproject.toml file
         # env_create_cmd = f"uv venv --seed && uv pip install -r '{req_file}'" # Works with original pyproject.toml file
         # env_create_cmd = f"uv add --project '{env_dir}' --requirements '{req_file}'" # Works with new/original pyproject.toml file
