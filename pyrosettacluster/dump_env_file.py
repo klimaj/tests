@@ -296,19 +296,19 @@ def main(
 
     elif env_manager == "uv":
         if not toml:
-            # py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-            # toml_format = "pyproject.toml"
-            # template_toml_file = Path(__file__).resolve().parent.parent / "actions" / "pyrosettacluster" / "uv" / toml_format
-            # with open(template_toml_file, "r") as f:
-            #     toml = f.read().format(
-            #         name=os.path.basename(env_dir),
-            #         py_version=py_version,
-            #     )
-            original_env_dir = os.path.join(os.path.dirname(env_dir), os.path.basename(env_dir).split("_reproduce")[0])
+            py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
             toml_format = "pyproject.toml"
-            original_toml_file = os.path.join(original_env_dir, toml_format)
-            with open(original_toml_file, "r") as f:
-                toml = f.read()
+            template_toml_file = Path(__file__).resolve().parent.parent / "actions" / "pyrosettacluster" / "uv" / toml_format
+            with open(template_toml_file, "r") as f:
+                toml = f.read().format(
+                    name=os.path.basename(env_dir),
+                    py_version=py_version,
+                )
+            # original_env_dir = os.path.join(os.path.dirname(env_dir), os.path.basename(env_dir).split("_reproduce")[0])
+            # toml_format = "pyproject.toml"
+            # original_toml_file = os.path.join(original_env_dir, toml_format)
+            # with open(original_toml_file, "r") as f:
+            #     toml = f.read()
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     # Determine output files based on manager
