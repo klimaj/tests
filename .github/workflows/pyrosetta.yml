@@ -45,6 +45,9 @@ jobs:
           export PATH="$HOME/.pixi/bin:$PATH"
           pixi --version
 
+      - name: Add repo root to PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/repo" >> $GITHUB_ENV
+
       - name: Run tests (pixi)
         shell: bash
         run: |
@@ -80,6 +83,9 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           uv --version
 
+      - name: Add repo root to PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/repo" >> $GITHUB_ENV
+
       - name: Run tests (uv)
         shell: bash
         run: |
@@ -111,6 +117,9 @@ jobs:
           activate-environment: conda-job
           use-mamba: false
           channel-priority: strict
+
+      - name: Add repo root to PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/repo" >> $GITHUB_ENV
 
       - name: Run tests (conda)
         shell: bash
@@ -162,6 +171,9 @@ jobs:
           echo "PATH=$PATH"
           which mamba
           mamba --version
+
+      - name: Add repo root to PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/repo" >> $GITHUB_ENV
 
       - name: Run tests (mamba)
         shell: bash -l {0}
