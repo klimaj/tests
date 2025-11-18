@@ -1,4 +1,23 @@
-# __author__ = "Jason C. Klima"
+"""
+*Warning*: This function runs a subprocess with one of the following commands:
+    - `conda env create ...`: when 'conda' is an executable
+    - `mamba env create ...`: when 'mamba' is an executable
+    - `uv pip install ...`: when 'uv' is an executable
+    - `pixi install ...`: when 'pixi' is an executable
+Installing certain packages may not be secure, so please only run with input files you trust.
+Learn more about PyPI security `here <https://pypi.org/security>`_ and conda security `here <https://www.anaconda.com/docs/reference/security>`_.
+
+Given an input file that was written by PyRosettaCluster, or a scorefile
+and a decoy name that was written by PyRosettaCluster, recreate the
+environment that was used to generate the decoy with a new environment name.
+
+The environment manager used (i.e., either 'conda', 'mamba', 'uv', or 'pixi') is
+automatically determined from the operating system environment variable
+'PYROSETTACLUSTER_ENVIRONMENT_MANAGER' if exported, or otherwise it must be
+provided using the `--env_manager` flag.
+"""
+
+__author__ = "Jason C. Klima"
 
 
 # import argparse
@@ -338,115 +357,204 @@
 #             flush=True,
 #         )
 
-
 # # ---------------------------------------
 
+import argparse
+import os
+import shutil
+import subprocess
 
-# def recreate_environment(
-#     env_dir,
-#     env_manager,
-# ):
-#     if env_manager == "pixi":
-#         env_create_cmd = "pixi install --frozen"
-#     elif env_manager == "uv":
-#         env_create_cmd = (
-#             f"uv init '{env_dir}' --python {py_version} && "
-#             f"uv add --requirements '{req_file}' --project '{project_dir}'"
-#         )
+from typing import Any, Dict, Optional
 
 
-# def parse_env_dir(path: str | None) -> str:
-#     """Validate and normalize the environment directory path."""
-#     if path is None:
-#         path = os.path.abspath(os.curdir)
-#     else:
-#         if not isinstance(path, str):
-#             raise argparse.ArgumentTypeError(
-#                 f"The 'env_dir' parameter must be of type `str`. Received: {type(path)}"
-#             )
-#         path = os.path.abspath(os.path.expanduser(path))
-
-#     if not os.path.isdir(path):
-#         raise argparse.ArgumentTypeError(
-#             f"The 'env_dir' parameter must be an existing directory. Received: '{path}'"
-#         )
-
-#     if not os.access(path, os.W_OK):
-#         raise argparse.ArgumentTypeError(
-#             f"The directory '{path}' is not writable."
-#         )
-
-#     return path
-
-
-# def validate_env_manager(manager: str) -> str:
-#     """
-#     Validate that the environment manager exists on PATH.
-#     """
-#     allowed = ["pixi", "uv", "conda", "mamba"]
-#     manager = manager.lower()
-
-#     if manager not in allowed:
-#         raise argparse.ArgumentTypeError(
-#             f"Invalid environment manager '{manager}'. Must be one of: {', '.join(allowed)}"
-#         )
-
-#     if shutil.which(manager) is None:
-#         raise argparse.ArgumentTypeError(
-#             f"The environment manager executable '{manager}' was not found on PATH. "
-#             "Please ensure it is installed."
-#         )
-
-#     return manager
+def run_subprocess(
+    cmd: str,
+    cwd: Optional[str] = None,
+    env: Optional[Dict[str, Any]] = None,
+    timeout: float = 3600,
+) -> str:
+    """Run a shell command and return its stdout, raising RuntimeError on failure."""
+    print(f"[INFO] Running command: `{cmd}`")
+    try:
+        output = subprocess.check_output(
+            cmd,
+            shell=True,
+            stderr=subprocess.STDOUT,
+            timeout=timeout,
+            text=True,
+            cwd=cwd,
+            env=env,
+            executable="/bin/bash",
+        )
+        print("[INFO] Subprocess stdout:\n" + output)
+        return output
+    except subprocess.CalledProcessError as ex:
+        print(
+            f"Command failed: `{cmd}`\n"
+            f"Return code: {ex.returncode}\n"
+            f"Output:\n{ex.output}"
+        )
+        raise RuntimeError(cmd) from ex
 
 
-# if __name__ == "__main__":
-#     # Pre-read environment variable (if any)
-#     env_manager_default = os.getenv("PYROSETTACLUSTER_ENVIRONMENT_MANAGER")
+def recreate_environment(env_dir: str, env_manager: str, timeout: float):
+    """
+    Recreate an environment using pixi, uv, conda, or mamba inside `env_dir`.
+    The directory must already exist.
+    """
 
-#     parser = argparse.ArgumentParser(
-#         description=(
-#             "Recreate a PyRosettaCluster environment using one of the supported "
-#             "environment managers ('pixi', 'uv', 'conda', 'mamba')."
-#         )
-#     )
+    if env_manager == "pixi":
+        lock_file = os.path.join(env_dir, "pixi.lock")
+        if not os.path.isfile(lock_file):
+            raise FileNotFoundError(
+                "Please ensure that the pixi 'pixi.lock' file "
+                "is in the pixi project directory, then try again."
+            )
 
-#     parser.add_argument(
-#         "--env_dir",
-#         type=parse_env_dir,
-#         required=False,
-#         default=None,
-#         help=(
-#             "Directory in which the environment will be created. Must exist and be "
-#             "writable. Defaults to the current working directory."
-#         ),
-#     )
+        for filename in ("pixi.toml", "pyproject.toml"):
+            if os.path.isfile(os.path.join(env_dir, filename)):
+                break
+        else:
+            raise FileNotFoundError(
+                "Please ensure that the pixi manifest 'pixi.toml' or 'pyproject.toml' file "
+                "is in the pixi project directory, then try again."
+            )
 
-#     parser.add_argument(
-#         "--env_manager",
-#         type=str,
-#         required=False,
-#         default=env_manager_default,
-#         help=(
-#             "Environment manager to use: pixi, uv, conda, or mamba.\n"
-#             "If omitted, the environment variable "
-#             "`PYROSETTACLUSTER_ENVIRONMENT_MANAGER` will be used if set."
-#         ),
-#     )
+        env_create_cmd = "pixi install --frozen"
 
-#     args = parser.parse_args()
+    elif env_manager == "uv":
+        req_file = os.path.join(env_dir, "requirements.txt")
+        if not os.path.isfile(req_file):
+            raise FileNotFoundError(
+                "Please ensure that the uv project 'requirements.txt' file "
+                "is in the uv project directory, then try again."
+            )
 
-#     # Now apply validation AFTER deciding which value to use
-#     if args.env_manager is None:
-#         raise SystemExit(
-#             "Error: No environment manager was provided.\n"
-#             "Provide --env_manager OR set the environment variable "
-#             "PYROSETTACLUSTER_ENVIRONMENT_MANAGER."
-#         )
+        # Install packages strictly from requirements.txt
+        env_create_cmd = f"uv pip install -r '{req_file}'"
+        # env_create_cmd = f"uv add --requirements '{req_file}'"
 
-#     args.env_manager = validate_env_manager(args.env_manager)
+    elif env_manager in ("conda", "mamba"):
+        yml_file = os.path.join(env_dir, "environment.yml")
+        if not os.path.isfile(yml_file):
+            raise FileNotFoundError(
+                f"Please ensure that the {env_manager} environment 'environment.yml' file "
+                f"is in the {env_manager} environment prefix directory, then try again."
+            )
 
-#     recreate_environment(
-#         env_dir=args.env_dir,
-#         env_manager=args.env_manager,
-#     )
+        env_create_cmd = f"{env_manager} env create -f '{yml_file}' -p '{env_dir}'"
+
+    else:
+        raise ValueError(f"Unsupported environment manager: {env_manager}")
+
+    run_subprocess(env_create_cmd, cwd=env_dir, timeout=timeout)
+
+    print(
+        f"[INFO] Environment successfully created using {env_manager} in directory: '{env_dir}'",
+        flush=True,
+    )
+
+
+def parse_env_dir(path: str | None) -> str:
+    """Validate and normalize the environment directory path."""
+    if path is None:
+        path = os.path.abspath(os.curdir)
+    else:
+        if not isinstance(path, str):
+            raise argparse.ArgumentTypeError(
+                f"The 'env_dir' parameter must be of type `str`. Received: {type(path)}"
+            )
+        path = os.path.abspath(os.path.expanduser(path))
+
+    if not os.path.isdir(path):
+        raise argparse.ArgumentTypeError(
+            f"The 'env_dir' parameter must be an existing directory. Received: '{path}'"
+        )
+
+    if not os.access(path, os.W_OK):
+        raise argparse.ArgumentTypeError(
+            f"The directory '{path}' is not writable."
+        )
+
+    return path
+
+
+def validate_env_manager(manager: str) -> str:
+    """Validate that the environment manager exists on PATH."""
+    allowed = ["pixi", "uv", "conda", "mamba"]
+    manager = manager.lower()
+
+    if manager not in allowed:
+        raise argparse.ArgumentTypeError(
+            f"Invalid environment manager '{manager}'. Must be one of: {', '.join(allowed)}"
+        )
+
+    if shutil.which(manager) is None:
+        raise argparse.ArgumentTypeError(
+            f"The environment manager executable '{manager}' was not found on PATH. "
+            "Please ensure it is installed."
+        )
+
+    return manager
+
+
+if __name__ == "__main__":
+    env_manager_default = os.getenv("PYROSETTACLUSTER_ENVIRONMENT_MANAGER")
+
+    parser = argparse.ArgumentParser(
+        description=(
+            "Recreate a PyRosettaCluster environment using one of the supported "
+            "environment managers ('pixi', 'uv', 'conda', 'mamba')."
+        )
+    )
+
+    parser.add_argument(
+        "--env_dir",
+        type=parse_env_dir,
+        required=False,
+        default=None,
+        help=(
+            "Directory in which the environment will be created. Must exist and be "
+            "writable. Defaults to the current working directory."
+        ),
+    )
+
+    parser.add_argument(
+        "--env_manager",
+        type=str,
+        required=False,
+        default=env_manager_default,
+        help=(
+            "Environment manager to use: pixi, uv, conda, or mamba.\n"
+            "If omitted, the environment variable "
+            "`PYROSETTACLUSTER_ENVIRONMENT_MANAGER` will be used if set."
+        ),
+    )
+
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        required=False,
+        default=1800.0,
+        help=(
+            "Timeout specifying the amount of time in seconds "
+            "before any subprocesses are terminated."
+        ),
+    )
+
+    args = parser.parse_args()
+
+    if args.env_manager is None:
+        raise SystemExit(
+            "Error: No environment manager was provided.\n"
+            "Provide the `--env_manager` flag, or otherwise set the "
+            "environment variable 'PYROSETTACLUSTER_ENVIRONMENT_MANAGER'."
+        )
+
+    args.env_manager = validate_env_manager(args.env_manager)
+
+    recreate_environment(
+        env_dir=args.env_dir,
+        env_manager=args.env_manager,
+        timeout=args.timeout,
+    )
