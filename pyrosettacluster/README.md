@@ -4,12 +4,11 @@
 The virtual environment configuration used for the original simulation is cached in the PyRosettaCluster output decoy file and in the _full-record_ output scorefile. 
 Please refer to the following table to select _one_ environment file extraction method based on the file type being used to recreate the original virtual environment:
 
-| File type extension | Output file type | Extraction method #1<br>(_without_ PyRosetta) | Extraction method #2<br>(_requires_ PyRosetta) |
+| File type extension | Output type | Extraction method #1<br>(_without_ PyRosetta) | Extraction method #2<br>(_requires_ PyRosetta) |
 | --- | --- | --- | --- |
 | `.pdb` | Decoy | Read file → Copy → Paste into new file | Run `dump_env_file.py` helper |
 | `.pdb.bz2` | Decoy | Unzip with `bzip2` → Read file → Copy → Paste into new file | Run `dump_env_file.py` helper |
-| `.pkl_pose`, `.pkl_pose.bz2` | Decoy | | Run `dump_env_file.py` helper |
-| `.b64_pose`, `.b64_pose.bz2` | Decoy | | Run `dump_env_file.py` helper |
+| `.pkl_pose`, `.pkl_pose.bz2`, `.b64_pose`, `.b64_pose.bz2` | Decoy | | Run `dump_env_file.py` helper |
 | `.json` | Full-record scorefile | Read file → Copy → Paste into new file | Run `dump_env_file.py` helper |
 | Pickled `pandas.DataFrame`<br>(`.gz`, `.xz`, `.tar`, etc.) | Full-record scorefile | | Run `dump_env_file.py` helper |
 
@@ -43,6 +42,7 @@ Run `python recreate_env.py` to recreate the virtual environment.
 
 ## 🚀 3️⃣ Reproduce PyRosettaCluster simulation!
 Use the python interpreter of the recreated environment to run your PyRosettaCluster simulation reproduction script.
+
 
 
 
