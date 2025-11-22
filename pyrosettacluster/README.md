@@ -13,10 +13,19 @@ Please refer to the following table to select _one_ environment file extraction 
 | Pickled `pandas.DataFrame`<br>(`.gz`, `.xz`, `.tar`, etc.) | Full-record scorefile | | Run `dump_env_file.py` helper |
 
 > [!NOTE]  
-> If running `dump_env_file.py`, the `pyrosetta` package must be installed in any existing virtual environment, and that virtual environment's python interpreter used to run the script.
+> **Extraction method #1:** If copy/pasting into a new file, the environment file string is located in the `record["instance"]["environment"]` nested key value of the PyRosettaCluster full record. Please paste it into one of the following file names (as expected in the next step) in a new folder, depending on the environment manager you're using to recreate the environment:
+> | Environment manager | New file name |
+> | --- | --- |
+> | `pixi` | `pixi.lock` |
+> | `uv` | `requirements.txt` |
+> | `conda` | `environment.yml` |
+> | `mamba` | `environment.yml` |
+
+> [!NOTE]  
+> **Extraction method #2:** If running `dump_env_file.py`, the `pyrosetta` package must be installed in any existing virtual environment, and that virtual environment's python interpreter used to run the script.
 
 > [!TIP]
-> See `python dump_env_file.py --help` for details.
+> **Extraction method #2:** See `python dump_env_file.py --help` for details.
 
 ## 🛠️ 2️⃣ Recreate environment
 Run `python recreate_env.py` to recreate the virtual environment.
@@ -42,6 +51,7 @@ Run `python recreate_env.py` to recreate the virtual environment.
 
 ## 🚀 3️⃣ Reproduce PyRosettaCluster simulation!
 Use the python interpreter of the recreated environment to run your PyRosettaCluster simulation reproduction script.
+
 
 
 
