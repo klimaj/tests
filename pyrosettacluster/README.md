@@ -20,6 +20,12 @@ Please refer to the following table to select _one_ environment file extraction 
 > | `uv` | `requirements.txt` |
 > | `conda` | `environment.yml` |
 > | `mamba` | `environment.yml` |
+> 
+> If using `pixi`/`uv` environment managers, please also extract the manifest file string (`pixi`) or project file string (`uv`) located in the `record["metadata"]["toml"]` nested key value of the PyRosettaCluster full record. The `record["metadata"]["toml_format"]` nested key value also specifies the file type format. Please paste it into one of the following file names (as expected in the next step) in the same new folder, depending on the environment manager you're using to recreate the environment:
+> | Environment manager | New file name |
+> | --- | --- |
+> | `pixi` | `pixi.toml` / `pypyroject.toml` |
+> | `uv` | `pyproject.toml` |
 
 > [!NOTE]  
 > **Extraction method #2:** If running `dump_env_file.py`, the `pyrosetta` package must be installed in any existing virtual environment, and that virtual environment's python interpreter used to run the script.
@@ -51,6 +57,7 @@ Run `python recreate_env.py` to recreate the virtual environment.
 
 ## 🚀 3️⃣ Reproduce PyRosettaCluster simulation!
 Use the python interpreter of the recreated environment to run your PyRosettaCluster simulation reproduction script.
+
 
 
 
