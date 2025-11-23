@@ -272,6 +272,9 @@ def main(
     toml_format = metadata_kwargs.get("toml_format")
     env_manager = metadata_kwargs.get("environment_manager")  # may be `None` in legacy cases
 
+    sha1 = instance_kwargs.get("sha1")
+    print(f"[INFO] GitHub SHA1: {sha1}")
+
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # Temporary bootstrap - delete after PR #567 is merged
     import sys
