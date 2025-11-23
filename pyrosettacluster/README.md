@@ -56,9 +56,13 @@ Please refer to the following table to select _one_ environment file extraction 
 > | --- | --- |
 > | `pixi` | `pixi.toml` / `pypyroject.toml` |
 > | `uv` | `pyproject.toml` |
+>
+> Also note the `record["instance"]["sha1"]` nested key value holding the GitHub SHA1 required to reproduce the simulation in step 3!
 
 > [!NOTE]  
 > **Extraction method #2:** If running `dump_env_file.py`, the `pyrosetta` package must be installed in any existing virtual environment, and that virtual environment's python interpreter used to run the script.
+>
+> Also note the printed GitHub SHA1 required to reproduce the simulation in step 3!
 
 > [!TIP]
 > **Extraction method #2:** See `python dump_env_file.py --help` for details.
@@ -86,7 +90,14 @@ Run `python recreate_env.py` to recreate the virtual environment.
 > See `python recreate_env.py --help` for details.
 
 ## 🚀 3️⃣ Reproduce PyRosettaCluster simulation!
-Use the python interpreter of the recreated environment to run your PyRosettaCluster simulation reproduction script. Here's a template script to get started!
+In order to re-run the same user-provided PyRosetta protocols, clone the original GitHub repository and checkout the original GitHub SHA1 used by the original PyRosettaCluster simulation. You'll need to know the owner and repository name (and if not, don't worry, there are ways to search GitHub by SHA1):
+```
+git clone --no-checkout https://github.com/<owner>/<repo>.git
+cd <repo>
+git fetch origin <SHA1>
+git checkout <SHA1>
+```
+Then, use the python interpreter of the recreated environment to run your PyRosettaCluster simulation reproduction script. Here's a template script to get started!
 ```
 from pyrosetta.distributed.cluster import reproduce
 
@@ -126,7 +137,6 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-Save your PyRosettaCluster simulation reproduction script, and run it with the newly recreated environment's python interpreter.
+Save your PyRosettaCluster simulation reproduction script, and run it with the _recreated environment's python interpreter_ (with the local repository HEAD at that same commit SHA1 for PyRosettaCluster validation). The PyRosetta build string and the environment file string will also be validated against the original record at this step.
 
-Congrats! You have now recreated a virtual environment and used it to successfully reproduce a distributed PyRosettaCluster simulation.
-
+🎉 Congrats! You have now recreated a virtual environment and used it to successfully reproduce a distributed PyRosettaCluster simulation.
