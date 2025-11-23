@@ -40,6 +40,7 @@ Please refer to the following table to select _one_ environment file extraction 
 | `.pkl_pose`, `.pkl_pose.bz2`, `.b64_pose`, `.b64_pose.bz2` | Decoy | | Run `dump_env_file.py` helper |
 | `.json` | Full-record scorefile | Read file → Copy → Paste into new file | Run `dump_env_file.py` helper |
 | Pickled `pandas.DataFrame`<br>(`.gz`, `.xz`, `.tar`, etc.) | Full-record scorefile | | Run `dump_env_file.py` helper |
+| `.init`, `.init.bz2` | PyRosetta initialization file | | Run `dump_env_file.py` helper |
 
 > [!NOTE]  
 > **Extraction method #1:** If copy/pasting into a new file, the environment file string is located in the `record["instance"]["environment"]` nested key value of the PyRosettaCluster full record. Please paste it into one of the following file names (as expected in the next step) in a new folder, depending on the environment manager you're using to recreate the environment:
@@ -85,14 +86,47 @@ Run `python recreate_env.py` to recreate the virtual environment.
 > See `python recreate_env.py --help` for details.
 
 ## 🚀 3️⃣ Reproduce PyRosettaCluster simulation!
-Use the python interpreter of the recreated environment to run your PyRosettaCluster simulation reproduction script.
+Use the python interpreter of the recreated environment to run your PyRosettaCluster simulation reproduction script. Here's a template script to get started!
+```
+from pyrosetta.distributed.cluster import reproduce
 
+# Import (or copy/paste) the original user-provided PyRosetta protocols committed to the original GitHub repository:
+from my_protocols import original_protocols  # Change depending on the original GitHub repository
 
+def main():
+    reproduce(
+        # Input either a PyRosettaCluster output decoy file or output PyRosetta initialization file
+        input_file=...,
 
+        # Or input a PyRosettaCluster scorefile and decoy name
+        scorefile=...,
+        decoy_name=...,
 
+        # Optional configurations:
+        protocols=original_protocols, # Can be `None` for auto-detection
+        clients=...,
+        input_packed_pose=...,
+        instance_kwargs={
+            "output_path": ...,
+            "scratch_dir": ...,
+            "project_name": ...,
+            "simulation_name": ...,
+            "output_decoy_types": ...,
+            "output_scorefile_types": ...,
+            "author": ...,
+            "email": ...,
+            "license": ...,
+        },
+        clients_indices=...,
+        resources=...,
+        skip_corrections=...,
+        init_from_file_kwargs=...,
+    )
 
+if __name__ == "__main__":
+    main()
+```
+Save your PyRosettaCluster simulation reproduction script, and run it with the newly recreated environment's python interpreter.
 
-
-
-
+Congrats! You have now recreated a virtual environment and used it to successfully reproduce a distributed PyRosettaCluster simulation.
 
