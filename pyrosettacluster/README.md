@@ -1,3 +1,6 @@
+# 👋 PyRosettaCluster
+PyRosettaCluster is a python framework for reproducible, high-throughput job distribution of user-defined PyRosetta protocols efficiently parallelized on the user's local computer, high-performance computing (HPC) cluster, or elastic cloud computing infrastructure with available compute resources.
+
 # 🏠 Creating Environments for PyRosettaCluster
 PyRosettaCluster supports running reproducible PyRosetta simulations from reproducible virtual environments created with [Conda](https://docs.conda.io/), [Mamba](https://mamba.readthedocs.io/), [uv](https://docs.astral.sh/uv/), and [Pixi](https://pixi.sh/) environment managers. Please install [PyRosetta](https://www.pyrosetta.org/downloads) (with `cxx11thread.serialization` support) and the following packages to get started!
 - `attrs`
@@ -25,11 +28,39 @@ PyRosettaCluster supports running reproducible PyRosetta simulations from reprod
 > [!IMPORTANT]
 > It is recommended to use either the `pixi`, `conda` or `mamba` environment manager.
 > 
-> _Explanation:_ If using the `uv` environment manager, currently the only way to install PyRosetta is using the [PyPI pyrosetta-installer](https://pypi.org/project/pyrosetta-installer/) package, which installs the `pyrosetta` package using `pip install ...` (instead of `uv pip install ...`), so `pyrosetta` will _not_ get registered as installed in the exported environment file. Furthermore, when recreating a `uv` environment (see below) using the [PyPI pyrosetta-installer](https://pypi.org/project/pyrosetta-installer/) package, the syntax does not allow specifying an exact PyRosetta version (automatically defaulting to the latest published PyRosetta version), and therefore installing the correct PyRosetta version in the recreated `uv` environment depends fortuitously on a prompt `uv` environment recreation after the original `uv` environment creation (typically within the same week). For this reason, `pixi`, `conda` and `mamba` are highly preferred environment managers instead of `uv` for reproducible environments used for reproducible PyRosettaCluster simulations. Note that the PyRosetta developers are working on supporting a bona fide `uv pip install pyrosetta=X.Y` syntax in the future — stay tuned!
+> _Explanation:_ If using the `uv` environment manager, currently the only way to install PyRosetta is using the [PyPI pyrosetta-installer](https://pypi.org/project/pyrosetta-installer/) package, which installs the `pyrosetta` package using `pip install ...` (instead of `uv pip install ...`), so `pyrosetta` will _not_ get registered as installed in the exported environment file. Furthermore, when recreating a `uv` environment (see below) using the [PyPI pyrosetta-installer](https://pypi.org/project/pyrosetta-installer/) package, the syntax does not allow specifying an exact PyRosetta version (automatically defaulting to the latest published PyRosetta version), and therefore installing the correct PyRosetta version in the recreated `uv` environment depends fortuitously on a prompt `uv` environment recreation after the original `uv` environment creation (typically within the same week). For this reason, `pixi`, `conda` and `mamba` are highly preferred environment managers instead of `uv` for reproducible environments used for reproducible PyRosettaCluster simulations. Note that the PyRosetta developers are working on supporting a bona fide `uv pip install pyrosetta==X.Y` syntax in the future — stay tuned!
+
+# 💨 Running PyRosettaCluster simulations
+Please see the [official PyRosettaCluster documentation](https://graylab.jhu.edu/PyRosetta.documentation/pyrosetta.distributed.cluster.html#pyrosetta.distributed.cluster.PyRosettaCluster) for all of the configuration options.
+> [!CAUTION]
+> PyRosettaCluster uses the [cloudpickle module](https://github.com/cloudpipe/cloudpickle), which can lead to arbitrary code execution resulting in a critical security vulnerability. **Please only run (1) with user-provided PyRosetta protocols from trusted sources, and (2) over a secure network (unless running on a local network).**
+> 
+> A primary feature of PyRosettaCluster is that arbitrary user-provided PyRosetta protocols are pickled, sent over a network, and unpickled, which allows the user to run customized macromolecular design and modeling workflows. Unless running solely on a local network, it is _highly_ recommended to operate PyRosettaCluster behind a trusted private network segment (i.e., a firewall) or setup TLS/SSL communication between network endpoints for authenticated and encrypted transmission of data. In PyRosettaCluster, there are two easy ways to setup TLS/SSL communication:
+>
+> **(1)** Use the `PyRosettaCluster(security=True)` option to invoke the `cryptography` package to automatically generate a `Security.temporary()` object on-the-fly through the `dask` or `dask-jobqueue` package.
+>
+> **(2)** Pre-generate a `dask.distributed.Security()` object using _OpenSSL_ (instead of the `cryptography` package) and pass it to PyRosettaCluster. See the `pyrosetta.distributed.cluster.generate_dask_tls_security()` function docstring for more information:
+> ```
+> security = pyrosetta.distributed.cluster.generate_dask_tls_security()
+> PyRosettaCluster(security=security)
+> ```
+
+> [!IMPORTANT]
+> PyRosettaCluster is a tool for reproducible computational macromolecular modeling and design. It is up to the user to define their PyRosetta protocols with reproducibility in mind – meaning user-provided PyRosetta protocols ought to be _deterministic_:
+> 
+> **(1)** Set seeds for any _impure functions_ (i.e., non-deterministic functions) implemented.
+>  - Pseudo-random seeds can either _(i)_ be hard-coded into PyRosetta protocols, _(ii)_ distributed as `kwargs` key values with each submitted task, or _(iii)_ be dynamically set based on each PyRosetta protocol's automatically-assigned random seed accessible through each PyRosetta protocol's `kwargs["PyRosettaCluster_seed"]` key value.
+> 
+> **(2)** If impure functions cannot be made pure through controlling the underlying randomness, please do _not_ rely on them to update the `Pose` in meaningful ways.
+>  - i.e., a randomly-named score key might be alright, but not randomly selecting the number of `Pose` conformational updates.
+>
+> **(3)** If implementing third-party software in PyRosetta protocols that does not support determinism, please ask the developers to support determinism in their software.
+>
+> In general, the determinism can be (and ought to be) strictly controlled when developing PyRosetta protocols. Note that PyRosettaCluster can still be used as a job distributor, even if PyRosetta protocol determinism is impossible for a specific application.
 
 # 🏘️ *Re*creating Environments for PyRosettaCluster
 
-## ✂ 1️⃣ Extract environment file ️
+## 1️⃣ ✂ Extract environment file ️
 The virtual environment configuration used for the original simulation is cached in the PyRosettaCluster output decoy file and in the _full-record_ output scorefile. 
 Please refer to the following table to select _one_ environment file extraction method based on the file type being used to recreate the original virtual environment:
 
@@ -57,17 +88,17 @@ Please refer to the following table to select _one_ environment file extraction 
 > | `pixi` | `pixi.toml` / `pypyroject.toml` |
 > | `uv` | `pyproject.toml` |
 >
-> Also note the `record["instance"]["sha1"]` nested key value holding the GitHub SHA1 required to reproduce the simulation in step 3!
+> Also note the `record["instance"]["sha1"]` nested key value holding the GitHub SHA1 required to reproduce the PyRosettaCluster simulation!
 
 > [!NOTE]  
 > **Extraction method #2:** If running `dump_env_file.py`, the `pyrosetta` package must be installed in any existing virtual environment, and that virtual environment's python interpreter used to run the script.
 >
-> Also note the printed GitHub SHA1 required to reproduce the simulation in step 3!
+> Also note the printed GitHub SHA1 required to reproduce the PyRosettaCluster simulation!
 
 > [!TIP]
 > **Extraction method #2:** See `python dump_env_file.py --help` for details.
 
-## 🛠️ 2️⃣ Recreate environment
+## 2️⃣ 🛠️ Recreate environment
 Run `python recreate_env.py` to recreate the virtual environment.
 
 > [!CAUTION]
@@ -89,7 +120,7 @@ Run `python recreate_env.py` to recreate the virtual environment.
 > [!TIP]
 > See `python recreate_env.py --help` for details.
 
-## 🚀 3️⃣ Reproduce PyRosettaCluster simulation!
+# 🚀 Reproducing PyRosettaCluster simulations
 In order to re-run the same user-provided PyRosetta protocols, clone the original GitHub repository and checkout the original GitHub SHA1 used by the original PyRosettaCluster simulation. You'll need to know the owner and repository name (and if not, don't worry, there are ways to search GitHub by SHA1):
 ```
 git clone --no-checkout https://github.com/<owner>/<repo>.git
@@ -101,8 +132,8 @@ Then, use the python interpreter of the recreated environment to run your PyRose
 ```
 from pyrosetta.distributed.cluster import reproduce
 
-# Import (or copy/paste) the original user-provided PyRosetta protocols committed to the original GitHub repository:
-from my_protocols import original_protocols  # Change depending on the original GitHub repository
+# Import (or copy/paste) the original user-provided PyRosetta protocols
+from my_protocols import protocol_1, protocol_2  # Change depending on the original GitHub repository structure
 
 def main():
     reproduce(
@@ -114,7 +145,7 @@ def main():
         decoy_name=...,
 
         # Optional configurations:
-        protocols=original_protocols, # Can be `None` for auto-detection
+        protocols=[protocol_1, protocol_2], # Can be `None` for auto-detection
         clients=...,
         input_packed_pose=...,
         instance_kwargs={
@@ -122,11 +153,6 @@ def main():
             "scratch_dir": ...,
             "project_name": ...,
             "simulation_name": ...,
-            "output_decoy_types": ...,
-            "output_scorefile_types": ...,
-            "author": ...,
-            "email": ...,
-            "license": ...,
         },
         clients_indices=...,
         resources=...,
@@ -137,6 +163,10 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-Save your PyRosettaCluster simulation reproduction script, and run it with the _recreated environment's python interpreter_ (with the local repository HEAD at that same commit SHA1 for PyRosettaCluster validation). The PyRosetta build string and the environment file string will also be validated against the original record at this step.
+✅ Save your PyRosettaCluster simulation reproduction script, and run it with the _recreated environment's python interpreter_ (with the local repository `HEAD` at that same commit SHA1 for PyRosettaCluster SHA1 validation). The PyRosetta build string and the environment file string will also be validated against the original record at this step.
 
 🎉 Congrats! You have now recreated a virtual environment and used it to successfully reproduce a distributed PyRosettaCluster simulation.
+
+
+
+
