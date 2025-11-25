@@ -1,6 +1,6 @@
 """
 Extract and write a PyRosettaCluster environment file based on
-metadata from a PyRosettaCluster result. This script requires PyRosetta
+metadata from a PyRosettaCluster result. This script requires PyRosetta version >=2025.47
 to be installed for the PyRosettaCluster environment file extraction.
 """
 
