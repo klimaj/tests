@@ -1,3 +1,9 @@
+"""
+This script extracts and writes a PyRosettaCluster environment file
+based on metadata from a PyRosettaCluster result. It requires PyRosetta
+to be installed for the PyRosettaCluster environment file extraction.
+"""
+
 __author__ = "Jason C. Klima"
 
 

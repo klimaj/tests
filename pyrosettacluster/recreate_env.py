@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-*Warning*: This function runs a subprocess with one of the following commands:
+*Warning*: This script runs a subprocess with one of the following commands:
     - `conda env create ...`: when 'conda' is an executable
     - `mamba env create ...`: when 'mamba' is an executable
     - `uv pip sync ...`: when 'uv' is an executable
