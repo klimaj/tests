@@ -34,9 +34,9 @@ PyRosettaCluster supports running reproducible PyRosetta simulations from reprod
 [Official Full List of Packages](https://github.com/RosettaCommons/rosetta/blob/main/tests/benchmark/tests/__init__.py#L69-L84)
 
 > [!IMPORTANT]
-> It is recommended to install the required packages individually when using the `pixi`/`uv` environment managers.
+> It is recommended to install the required packages individually when using the `uv` environment manager.
 >
-> _Explanation:_ If using `pixi`/`uv` environment managers, it is highly recommended to avoid using the [PyPI pyrosetta-distributed](https://pypi.org/project/pyrosetta-distributed/) package to install the required `pyrosetta.distributed` framework packages (which installs subpackages using `pip install ...`, so the subpackages will _not_ get registered as installed in the exported `pixi`/`uv` environment file). Instead, please install the required `pyrosetta.distributed` framework packages individually to register them properly in the environment.
+> _Explanation:_ If using the `uv` environment manager, it is highly recommended to avoid using the [PyPI pyrosetta-distributed](https://pypi.org/project/pyrosetta-distributed/) package to install the required `pyrosetta.distributed` framework packages (which installs subpackages using `pip install ...`, so the subpackages will _not_ get registered as installed in the exported `uv` environment file). Instead, please install the required `pyrosetta.distributed` framework packages individually to register them properly in the uv project.
 
 > [!IMPORTANT]
 > It is recommended to use either the `pixi`, `conda` or `mamba` environment manager.
@@ -190,6 +190,7 @@ if __name__ == "__main__":
 ✅ Save your PyRosettaCluster simulation reproduction script, and run it with the _recreated environment's python interpreter_ (with the local repository `HEAD` at that same commit SHA1 for PyRosettaCluster SHA1 validation). The PyRosetta build string and the environment file string will also be validated against the original record at this step.
 
 🎉 Congrats! You have now recreated a virtual environment and used it to successfully reproduce a distributed PyRosettaCluster simulation.
+
 
 
 
