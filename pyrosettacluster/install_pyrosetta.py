@@ -5,11 +5,9 @@ Perform PyRosetta installation with the PyPI `pyrosetta-installer` package.
 __author__ = "Jason C. Klima"
 
 
+import argparse
 import pyrosetta_installer
 
-
-# Order of mirrors to prioritize
-MIRROR_ORDER = (0, 1)
 
 # Base `pyrosetta_installer.install_pyrosetta` kwargs
 BASE_KWARGS = dict(
@@ -44,12 +42,32 @@ def install_pyrosetta_with_mirrors(mirrors, base_kwargs):
     else:
         raise RuntimeError(
             f"All PyRosetta installation attempts failed. "
-            f"Mirrors tried: {mirrors}. Most recent exception: {prev_exception}"
+            f"Mirrors tried: {mirrors}. Last exception: {prev_exception}"
         ) from prev_exception
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Install PyRosetta using the PyPI 'pyrosetta-installer' package with automatic mirror fallback."
+    )
+    parser.add_argument(
+        "--mirror_order",
+        nargs="+",
+        type=int,
+        default=[0, 1],
+        help=(
+            "Optionally specify the PyRosetta installer mirror order to try, e.g. `--mirror_order 0 1`. "
+            "See the PyPI 'pyrosetta-installer' package website for details."
+        ),
+    )
+
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = parse_args()
+    mirror_order = tuple(args.mirror_order)
     install_pyrosetta_with_mirrors(
-        mirrors=MIRROR_ORDER,
+        mirrors=mirror_order,
         base_kwargs=BASE_KWARGS,
     )
