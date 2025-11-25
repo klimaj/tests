@@ -25,8 +25,10 @@ def setup_pixi_environment(env_dir, timeout):
     - writes a compatible 'pixi.toml' file
     - runs `pixi install` to build a new pixi environment
     """
-    # Detect Python version
-    py_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    # Detect current Python version
+    # Pixi/Conda only publishes minor versions (e.g., `3.9.x`), not every patch releases (e.g., `3.9.25`)
+    # Therefore, use a wild-card to fetch the latest micro version available
+    py_version = f"{sys.version_info.major}.{sys.version_info.minor}.*"
     py_feature = f"py{sys.version_info.major}{sys.version_info.minor}"
 
     # Detect platform

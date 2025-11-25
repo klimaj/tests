@@ -11,7 +11,7 @@ pyrosetta = "*"
 pyrosetta-distributed = "*"
 
 [feature.{py_feature}.dependencies]
-python = "{py_version}.*"
+python = "{py_version}"
 
 [environments]
 {py_feature} = ["{py_feature}"]
