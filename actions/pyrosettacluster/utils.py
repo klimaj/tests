@@ -6,7 +6,7 @@ __author__ = "Jason C. Klima"
 import platform
 
 
-ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.graylab.jhu.edu" # "https://conda.rosettacommons.org"
+ROSETTACOMMONS_CONDA_CHANNEL = "https://conda.rosettacommons.org" # "https://conda.graylab.jhu.edu"
 
 
 def detect_platform():
