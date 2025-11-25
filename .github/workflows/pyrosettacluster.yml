@@ -22,6 +22,7 @@ jobs:
     name: Pixi
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
@@ -61,6 +62,7 @@ jobs:
     name: Uv
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
@@ -95,6 +97,7 @@ jobs:
     name: Conda
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
@@ -127,6 +130,7 @@ jobs:
     name: Mamba
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
