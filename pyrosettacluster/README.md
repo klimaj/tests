@@ -109,7 +109,7 @@ Please refer to the following table to select _one_ environment file extraction 
 > Also note the `record["instance"]["sha1"]` nested key value holding the GitHub commit SHA1 required to [reproduce the PyRosettaCluster simulation](#clone-original-repository)!
 
 > [!NOTE]  
-> **Extraction method #2:** If running `dump_env_file.py`, the `pyrosetta` package must be installed in any existing virtual environment, and that virtual environment's python interpreter used to run the script.
+> **Extraction method #2:** If running `dump_env_file.py`, the `pyrosetta` package (with version >=2025.47) must be installed in any existing virtual environment, and that virtual environment's python interpreter used to run the script.
 >
 > Also note the printed GitHub commit SHA1 required to [reproduce the PyRosettaCluster simulation](#clone-original-repository)!
 
@@ -190,6 +190,7 @@ if __name__ == "__main__":
 ✅ Save your PyRosettaCluster simulation reproduction script, and run it with the _recreated environment's python interpreter_ (with the local repository `HEAD` at that same commit SHA1 for PyRosettaCluster SHA1 validation). The PyRosetta build string and the environment file string will also be validated against the original record at this step.
 
 🎉 Congrats! You have now recreated a virtual environment and used it to successfully reproduce a distributed PyRosettaCluster simulation.
+
 
 
 
