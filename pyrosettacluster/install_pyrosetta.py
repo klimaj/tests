@@ -5,10 +5,10 @@ import pyrosetta_installer
 
 
 # Order of mirrors to prioritize
-MIRROR_ORDER = (1,) # (1, 0)
+MIRROR_ORDER = (0, 1)
 
-
-kwargs = dict(
+# Base `pyrosetta_installer.install_pyrosetta` kwargs
+BASE_KWARGS = dict(
     distributed=False,
     serialization=True,
     type="Release",
@@ -18,14 +18,34 @@ kwargs = dict(
     silent=False,
 )
 
-try:
-    kwargs.update(mirror=MIRROR_ORDER[0])
-    pyrosetta_installer.install_pyrosetta(**kwargs)
-except Exception as ex:
-    _err_msg = f"PyRosetta installation with 'mirror={MIRROR_ORDER[0]}' failed: {ex}"
-    if len(MIRROR_ORDER) == 2:
-        print(f"{_err_msg}. Retrying with 'mirror={MIRROR_ORDER[1]}'.")
-        kwargs.update(mirror=MIRROR_ORDER[1])
-        pyrosetta_installer.install_pyrosetta(**kwargs)
+
+def install_pyrosetta_with_mirrors(mirrors, base_kwargs):
+    """
+    Attempt to install PyRosetta using the `pyrosetta-installer` package with a
+    prioritized list of mirrors. Returns cleanly on first success, or raises if
+    all attempts fail.
+    """
+    prev_exception = None
+    for mirror in mirrors:
+        try:
+            print(f"Attempting PyRosetta installation using `mirror={mirror}`...")
+            kwargs = {**base_kwargs, "mirror": mirror}
+            pyrosetta_installer.install_pyrosetta(**kwargs)
+            print(f"PyRosetta installation succeeded using `mirror={mirror}`!")
+            break
+        except Exception as ex:
+            prev_exception = ex
+            print(f"{type(ex).__name__}: PyRosetta installation failed with `mirror={mirror}`: {ex}")
+            continue
     else:
-        raise NotImplementedError(f"{_err_msg} Skipping installation attempts with mirrors.")
+        raise RuntimeError(
+            f"All PyRosetta installation attempts failed. "
+            f"Mirrors tried: {mirrors}. Most recent exception: {prev_exception}"
+        ) from prev_exception
+
+
+if __name__ == "__main__":
+    install_pyrosetta_with_mirrors(
+        mirrors=MIRROR_ORDER,
+        base_kwargs=BASE_KWARGS,
+    )
