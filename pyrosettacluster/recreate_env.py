@@ -157,7 +157,7 @@ def recreate_environment(env_dir: str, env_manager: str, timeout: float):
     )
 
 
-def parse_env_dir(path: str | None) -> str:
+def parse_env_dir(path: Optional[str]) -> str:
     """Validate and normalize the environment directory path."""
     if path is None:
         path = os.path.abspath(os.curdir)
