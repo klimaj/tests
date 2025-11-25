@@ -3,149 +3,149 @@ __author__ = "Jason C. Klima"
 
 import argparse
 import os
-import sys
+# import sys
 import tempfile
 
 from pyrosetta.distributed.cluster import reproduce, run
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-import pyrosetta
-import subprocess
-import sys
+# import pyrosetta
+# import subprocess
+# import sys
 
-from pyrosetta.bindings.utility import bind_method
-from pyrosetta.distributed.cluster.config import (
-    get_environment_manager,
-    get_environment_var,
-    source_domains,
-)
+# from pyrosetta.bindings.utility import bind_method
+# from pyrosetta.distributed.cluster.config import (
+#     get_environment_manager,
+#     get_environment_var,
+#     source_domains,
+# )
 
-def get_env_export_cmd(env_manager: str) -> str:
-    """
-    Return the appropriate environment export command for the given environment manager.
-    Automatically adjusts for Pixi and uv when a project/manifest path is set via
-    environment variables or custom run paths.
+# def get_env_export_cmd(env_manager: str) -> str:
+#     """
+#     Return the appropriate environment export command for the given environment manager.
+#     Automatically adjusts for Pixi and uv when a project/manifest path is set via
+#     environment variables or custom run paths.
 
-    Args:
-        env_manager: A `str` object of either "pixi", "uv", "mamba", "conda".
+#     Args:
+#         env_manager: A `str` object of either "pixi", "uv", "mamba", "conda".
 
-    Returns:
-        A shell command string for subprocess execution.
-    """
+#     Returns:
+#         A shell command string for subprocess execution.
+#     """
 
-    # Default commands
-    base_cmds = {
-        "pixi": "pixi lock --check || pixi lock --no-install",
-        "uv": "uv export --format requirements-txt --frozen",
-        "mamba": f"mamba env export --prefix '{sys.prefix}'",
-        "conda": f"conda env export --prefix '{sys.prefix}'",
-    }
+#     # Default commands
+#     base_cmds = {
+#         "pixi": "pixi lock --check || pixi lock --no-install",
+#         "uv": "uv export --format requirements-txt --frozen",
+#         "mamba": f"mamba env export --prefix '{sys.prefix}'",
+#         "conda": f"conda env export --prefix '{sys.prefix}'",
+#     }
 
-    # Pixi
-    if env_manager == "pixi":
-        # https://pixi.sh/dev/reference/environment_variables/#environment-variables-set-by-pixi
-        manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
-        if manifest_path:
-            # Append --manifest-path flag to both commands in the OR clause
-            return (
-                f"pixi lock --check --manifest-path '{manifest_path}' || "
-                f"pixi lock --no-install --manifest-path '{manifest_path}'"
-            )
+#     # Pixi
+#     if env_manager == "pixi":
+#         # https://pixi.sh/dev/reference/environment_variables/#environment-variables-set-by-pixi
+#         manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
+#         if manifest_path:
+#             # Append --manifest-path flag to both commands in the OR clause
+#             return (
+#                 f"pixi lock --check --manifest-path '{manifest_path}' || "
+#                 f"pixi lock --no-install --manifest-path '{manifest_path}'"
+#             )
 
-        return base_cmds["pixi"]
+#         return base_cmds["pixi"]
 
-    # Uv
-    elif env_manager == "uv":
-        project_dir = (
-            os.environ.get("UV_PROJECT")
-            or os.environ.get("UV_PROJECT_ENVIRONMENT")
-        )
-        if project_dir:
-            # Append --project flag
-            return (
-                f"uv export --format requirements-txt --frozen --project '{project_dir}'"
-            )
+#     # Uv
+#     elif env_manager == "uv":
+#         project_dir = (
+#             os.environ.get("UV_PROJECT")
+#             or os.environ.get("UV_PROJECT_ENVIRONMENT")
+#         )
+#         if project_dir:
+#             # Append --project flag
+#             return (
+#                 f"uv export --format requirements-txt --frozen --project '{project_dir}'"
+#             )
 
-        return base_cmds["uv"]
+#         return base_cmds["uv"]
 
-    # Conda / Mamba
-    else:
-        return base_cmds.get(env_manager, "")
+#     # Conda / Mamba
+#     else:
+#         return base_cmds.get(env_manager, "")
 
-@bind_method(pyrosetta.distributed.cluster.toolkit)
-@bind_method(pyrosetta.distributed.cluster.converters)
-@bind_method(pyrosetta.distributed.cluster.converter_tasks)
-def get_yml() -> str:
-    """
-    Export the current environment to a YAML string, excluding metadata lines
-    depending on the environment manager.
-    """
+# @bind_method(pyrosetta.distributed.cluster.toolkit)
+# @bind_method(pyrosetta.distributed.cluster.converters)
+# @bind_method(pyrosetta.distributed.cluster.converter_tasks)
+# def get_yml() -> str:
+#     """
+#     Export the current environment to a YAML string, excluding metadata lines
+#     depending on the environment manager.
+#     """
 
-    def remove_comments(text: str) -> str:
-        """Remove lines starting with '#'."""
-        return "\n".join(
-            line for line in text.splitlines() if not line.strip().startswith("#")
-        )
+#     def remove_comments(text: str) -> str:
+#         """Remove lines starting with '#'."""
+#         return "\n".join(
+#             line for line in text.splitlines() if not line.strip().startswith("#")
+#         )
 
-    def remove_metadata(text: str) -> str:
-        """Remove 'name:' and 'prefix:' lines."""
-        filtered_lines = [
-            line
-            for line in text.splitlines()
-            if not line.startswith(("name:", "prefix:")) and line.strip()
-        ]
-        return "\n".join(filtered_lines) + "\n"
+#     def remove_metadata(text: str) -> str:
+#         """Remove 'name:' and 'prefix:' lines."""
+#         filtered_lines = [
+#             line
+#             for line in text.splitlines()
+#             if not line.startswith(("name:", "prefix:")) and line.strip()
+#         ]
+#         return "\n".join(filtered_lines) + "\n"
 
-    env_manager = get_environment_manager()
-    environment_cmd = get_env_export_cmd(env_manager)
+#     env_manager = get_environment_manager()
+#     environment_cmd = get_env_export_cmd(env_manager)
 
-    print(f"Running environment command: `{environment_cmd}`")
+#     print(f"Running environment command: `{environment_cmd}`")
 
-    # Handle Pixi separately since it writes a pixi.lock file
-    if env_manager == "pixi":
-        try:
-            subprocess.run(
-                environment_cmd,
-                shell=True,
-                check=True,
-                stderr=subprocess.DEVNULL,
-            )
-            # https://pixi.sh/dev/reference/environment_variables/#environment-variables-set-by-pixi
-            manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
-            lock_path = os.path.join(
-                os.path.dirname(manifest_path) if manifest_path else os.getcwd(),
-                "pixi.lock",
-            )
-            with open(lock_path, encoding="utf-8") as f:
-                return f.read()
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            return ""
+#     # Handle Pixi separately since it writes a pixi.lock file
+#     if env_manager == "pixi":
+#         try:
+#             subprocess.run(
+#                 environment_cmd,
+#                 shell=True,
+#                 check=True,
+#                 stderr=subprocess.DEVNULL,
+#             )
+#             # https://pixi.sh/dev/reference/environment_variables/#environment-variables-set-by-pixi
+#             manifest_path = os.environ.get("PIXI_PROJECT_MANIFEST")
+#             lock_path = os.path.join(
+#                 os.path.dirname(manifest_path) if manifest_path else os.getcwd(),
+#                 "pixi.lock",
+#             )
+#             with open(lock_path, encoding="utf-8") as f:
+#                 return f.read()
+#         except (subprocess.CalledProcessError, FileNotFoundError):
+#             return ""
 
-    # For all other environment managers, run the export command and process the output
-    try:
-        result = subprocess.run(
-            environment_cmd,
-            shell=True,
-            check=True,
-            stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            text=True,
-        )
-    except subprocess.CalledProcessError:
-        return ""
+#     # For all other environment managers, run the export command and process the output
+#     try:
+#         result = subprocess.run(
+#             environment_cmd,
+#             shell=True,
+#             check=True,
+#             stderr=subprocess.DEVNULL,
+#             stdout=subprocess.PIPE,
+#             text=True,
+#         )
+#     except subprocess.CalledProcessError:
+#         return ""
 
-    raw_yml = result.stdout.strip()
-    if not raw_yml:
-        return ""
+#     raw_yml = result.stdout.strip()
+#     if not raw_yml:
+#         return ""
 
-    if env_manager == "uv":
-        return remove_comments(raw_yml)
-    elif env_manager in ("conda", "mamba"):
-        return remove_metadata(raw_yml)
+#     if env_manager == "uv":
+#         return remove_comments(raw_yml)
+#     elif env_manager in ("conda", "mamba"):
+#         return remove_metadata(raw_yml)
 
-    raise NotImplementedError(env_manager)
-# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#     raise NotImplementedError(env_manager)
+# # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 def create_tasks():
