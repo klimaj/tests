@@ -1,4 +1,4 @@
-# ✨ PyRosetta Extras: a repository for PyRosetta scripts, tools, unit testing, and documentation
+# ✨ PyRosetta Extras: a repository for extra PyRosetta scripts, tools, unit testing, and documentation
 > [!IMPORTANT]
 > Scripts in this GitHub repository may require download and installation of [PyRosetta software](https://www.pyrosetta.org/downloads) to run properly. 
 > Downloads of PyRosetta software are provided to academic and non-commercial users under the [PyRosetta Software Non-Commercial License Agreement](https://github.com/RosettaCommons/rosetta/blob/main/LICENSE.PyRosetta.md).
