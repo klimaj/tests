@@ -57,4 +57,4 @@ jobs:
 
       - name: Sanity check import + init
         run: |
-          python -c "import pyrosetta; pyrosetta.init(); print('init ok')"
+          python -c "import pyrosetta; pyrosetta.init(); print(pyrosetta._build_signature()); print('init ok')"
